@@ -6,8 +6,9 @@
 #define MAMAN14_LABELHANDLING_H
 
 #include "errorsHeader.h"
-#include "string.h"
-#include "ctype.h"
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 #define LABEL_SEARCH 0
 #define INSTRUCTION_SEARCH 1

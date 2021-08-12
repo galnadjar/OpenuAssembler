@@ -8,7 +8,7 @@
 int analyzeLabel(char* lineInput, int i, int line, char** label){
 
     int state = VALID,ch,wordStarted = 0,ind = 0;
-    char word[MAX_LABEL_LENGTH+1];
+    char* word = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
 
     for(;i < strlen(lineInput) -1 && state == VALID;i++){
         ch = (int)lineInput[i];
@@ -55,8 +55,9 @@ int analyzeLabel(char* lineInput, int i, int line, char** label){
         i = ERROR;
 
     else{
-        word[strlen(word)] = '\0';
-        strcpy((*label),word);}
+        strcpy((*label),word);
+        free(word);}
+
     return i;
 }
 

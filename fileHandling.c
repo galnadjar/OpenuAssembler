@@ -129,13 +129,14 @@ int analyzeEntrySymbol(labelTablePtr labelPtr,entryTablePtr* entryHead){
 /*returns 1 if all the label exists and corresponds to the matching rules,otherwise -1*/
 int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead){
 
-    int state = VALID;
+    int state = VALID,found = 0;
     symbolPtr symPtr = (*symbolHead);
 
     for(;symPtr;symPtr = getSymbolNextNode(symPtr)){ /*iterating through the symbol table*/
 
         if(!(strcmp(getSymbolLabel(symPtr),getLabelTableName(labelPtr)))){ /*case they have same name*/
-            if(getSymbolType(symPtr) == EXTERN_AT){ /*todo fix this symbol line*/
+            found = 1;
+            if(getSymbolType(symPtr) == EXTERN_AT){
                 if(getLabelBranch(labelPtr) == J_BRANCHING){
                     state = addToExtTable(externHead, getLabelTableName(labelPtr), getLabelTableAddress(labelPtr));
                     if(state == ERROR)
@@ -153,11 +154,12 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
                     updateImmed(codeHead, getLabelTableName(labelPtr), getSymbolAddress(symPtr));
             }
         }
+    }
 
-        else{
-            state = ERROR;
-            ERROR_LABEL_EXISTENCE(getLabelTableLine(labelPtr),getLabelTableName(labelPtr));}
-        }
+    if(!found){
+        state = ERROR;
+        ERROR_LABEL_EXISTENCE(getLabelTableLine(labelPtr),getLabelTableName(labelPtr));}
+
 
     return state;
 }
@@ -187,11 +189,13 @@ void readFile(FILE* fp,char* fileName) {
     char *lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
     char *wordSaved = NULL,*labelName = NULL;
 
+    /*todo check about the allocation of those dataStructers*/
     symbolPtr symbolTableHead = NULL;
     entryTablePtr entryTableHead = (entryTablePtr) calloc(1,sizeof(getExternSize()));
     codeImgPtr codeImgHead = NULL;
     dataImgPtr dataImgHead = NULL;
     labelTablePtr labelTableHead = (labelTablePtr) calloc(1,sizeof(getLabelTableSize()));
+
     while (1) {
 
         fgets(lineInput, MAX_ROW_LENGTH-1, fp);

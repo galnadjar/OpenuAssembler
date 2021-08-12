@@ -83,12 +83,6 @@ int createSymbol(symbolPtr* symbolName,char* label,long address,int category,int
     return state;
 }
 
-void copySymbolValues(symbolPtr* dest,symbolPtr source){
-    (*dest)->address = source->address;
-    strcpy((*dest)->name,source->name);
-    (*dest)->type = source->type;
-}
-
 char* getSymbolLabel(symbolPtr ptr){
     return ptr->name;
 }
