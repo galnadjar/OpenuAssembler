@@ -81,11 +81,11 @@ int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeI
     int state = VALID,funct;
     int opcode = getOpCode(instruction);
 
-    if(opcode < 2){/*all R type instructs*/
+    if(opcode < I_CMD_MIN_OPCODE){/*all R type instructs*/
         funct = getFunct(instruction,opcode);
         state = handleRargs(lineInput,i,line,IC,opcode,funct,imgHead);}
 
-    else if(opcode > 24) /*all J type instructs*/
+    else if(opcode > I_CMD_MAX_OPCODE) /*all J type instructs*/
         state = handleJargs(lineInput, i, line,IC,opcode,imgHead,labelTableHead);
 
     else /*all I type instructs*/
@@ -248,17 +248,17 @@ int setIcmdWithoutLabel(char* lineInput,int i,int line,int* rs,long* immed,int* 
     if (i != ERROR) {
         i = commaAfterSpace(lineInput, i);
         if (i > 0) {
-            i = checkAndSetNum(lineInput, i + 1, line, immed, 1,MIN_TWO_BYTES_SIZE,MAX_TWO_BYTES_SIZE);
+            i = checkAndSetNum(lineInput, i, line, immed, 1,MIN_TWO_BYTES_SIZE,MAX_TWO_BYTES_SIZE);
             if (i != ERROR) {
-                i = checkTwoByteSize(*immed);
-                if(i > 0){
+                state = checkTwoByteSize(*immed);
+                if(state > 0){
                     i = commaAfterSpace(lineInput, i);
                     if (i > 0) {
-                        i = checkAndSetReg(lineInput,i+1,line,rt,0);
+                        i = checkAndSetReg(lineInput,i,line,rt,0);
                         if (i != ERROR) {
                             i = locAfterSpace(lineInput, i);
 
-                            if (i != MAX_ROW_LENGTH - 1){
+                            if (i != strlen(lineInput) - 1){
                                 ERROR_EXTRANEOUS_END_OF_CMD(line);
                                 state = ERROR;}
                         }
@@ -296,7 +296,7 @@ int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode
         if (i > 0) { /*currently with 1 reg and a comma*/
 
             if(opcode == logic_arit){
-                i = checkAndSetReg(lineInput, i + 1, line, rt,1);
+                i = checkAndSetReg(lineInput, i, line, rt,1);
                 if (i != ERROR) /*check if a proper reg*/
                     i = commaAfterSpace(lineInput, i);
             }
@@ -305,11 +305,11 @@ int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode
                 (*rt) = 0;
 
             if (i > 0){/*check if comma was found*/
-                i = checkAndSetReg(lineInput, i + 1, line, rd,0);
+                i = checkAndSetReg(lineInput, i, line, rd,0);
                 if (i != ERROR) {
                     i = locAfterSpace(lineInput, i);
 
-                    if (i != MAX_ROW_LENGTH - 1) { /*check if no more args were passed in the line*/
+                    if (i != strlen(lineInput) - 1) { /*check if no more args were passed in the line*/
                         ERROR_EXTRANEOUS_END_OF_CMD(line);
                         state = ERROR;}
                 }
@@ -330,7 +330,7 @@ int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode
 int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,char** label){
     int state = VALID;
 
-    if(opcode != stop && locAfterSpace(lineInput,i) == MAX_ROW_LENGTH-1){/*empty instruction*/
+    if(opcode != stop && locAfterSpace(lineInput,i) == strlen(lineInput)-1){/*empty instruction*/
         state = ERROR;
         ERROR_EMPTY_INSTRUCTION(line);
     }
@@ -339,7 +339,7 @@ int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,
         i = analJmp(lineInput,i,line,reg,address,label);
         if(i != ERROR){
             i = locAfterSpace(lineInput,i);
-            if(i != MAX_ROW_LENGTH-1)
+            if(i != strlen(lineInput)-1)
                 ERROR_EXTRANEOUS_END_OF_CMD(line);
         }
     }
@@ -355,7 +355,7 @@ int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,
         i = analyzeLabel(lineInput,i,line,label);
         if(i != ERROR){
             i = locAfterSpace(lineInput,i);
-            if(i != MAX_ROW_LENGTH-1){
+            if(i != strlen(lineInput)-1){
                 ERROR_EXTRANEOUS_END_OF_CMD(line);
                 state = ERROR;}
             else
@@ -370,7 +370,7 @@ int analStop(char* lineInput,int i,int line){
 
     int state = VALID;
     i = locAfterSpace(lineInput,i);
-    if(i != MAX_ROW_LENGTH-1){
+    if(i != strlen(lineInput)-1){
         ERROR_EXTRANEOUS_END_OF_CMD(line);
         state = ERROR;
     }
@@ -412,7 +412,7 @@ int analJmp(char* lineInput,int i,int line,int* reg,long* address,char** labelNa
 int checkFirstLetter(char* lineInput,int i){
     int option;
     int state = VALID,ch;
-    for(;i < MAX_ROW_LENGTH-1 && state == VALID;i++){
+    for(;i < strlen(lineInput)-1 && state == VALID;i++){
         ch = (int)lineInput[i];
         if(isspace(ch))
             i = locAfterSpace(lineInput,i)-1;
@@ -438,7 +438,7 @@ int checkFirstLetter(char* lineInput,int i){
 int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq){
     int digit = 0,regSign = 0,regNum = 0,ch,state = VALID;
 
-    for(;i < MAX_ROW_LENGTH && state != ERROR && state != EXIT;i++){
+    for(;i < strlen(lineInput)-1 && state == VALID;i++){
 
         ch = (int)lineInput[i];
         if(isspace(ch)) {
@@ -451,8 +451,9 @@ int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq){
         else if(isdigit(ch))
             state = handleRegDigit(regSign,&digit,&regNum,ch,line);
 
-        else if(ch == ',')
+        else if(ch == ','){
             state = handleRegComma(reg,regNum,line, ch, digit, regSign, commaReq);
+            i--;}
 
         else if(ch == '$'){
             if(!regSign)

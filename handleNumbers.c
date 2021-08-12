@@ -43,7 +43,8 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
             state = handleNumComma(operator, &sum, commaReq, line, ch);
             if(state == EXIT){
                 firstDigit = 0;
-                (*num) = sum;}
+                (*num) = sum;
+                i--;}
         }
 
 

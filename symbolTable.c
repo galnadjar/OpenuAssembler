@@ -26,14 +26,16 @@ int addSymbol(symbolPtr* symbolHead, char* label, long address, int category, in
             ERROR_ATTRIBUTE_ASSIGN(line);}
     }
     else{
-        if(!getSymbolType(*symbolHead)){ /*its first node*/
-            setSymbolValues(symbolHead,label,address,category,line);}
+        state = createSymbol(&ptr, label, address, category, line);
+        if(state != ERROR){
+            if(!(*symbolHead)) /*is first node*/
+                (*symbolHead) = ptr;
 
-        else{
-            state = createSymbol(&ptr, label, address, category, line);
-            if(state != ERROR)
+            else
                 addNodeToSymbolTable(symbolHead, &ptr);
         }
+
+
     }
     return state;
 }

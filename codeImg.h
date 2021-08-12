@@ -31,5 +31,9 @@ codeImgPtr getNextCodeNode(codeImgPtr ptr);
 
 #define UNKNOWN_ADDRESS (-1)
 #define STOP_OPCODE 63
+#define I_BRANCHING_MIN_OPCODE 15
+#define I_BRANCHING_MAX_OPCODE 18
+#define J_CMDS_WITH_LABEL_MIN_OPCODE 30
+#define J_CMDS_WITH_LABEL_MAX_OPCODE 32
 
 #endif //MAMAN14_CODEIMG_H

@@ -4,7 +4,7 @@
 int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int line) {
 
     int ch,state = VALID;
-    char* word= (char*) calloc(MAX_ROW_LENGTH, sizeof(char));
+    char* word= (char*) calloc(strlen(lineInput), sizeof(char));
     int wordloc = 0,firstLetter = 0,dot = 0;
 
     for (; (*i) < strlen(lineInput) -1 && state == VALID;(*i)++) {
@@ -200,7 +200,7 @@ int handleLabelOrInstruction(int* category,char* word,int line){
 
     } else if ((*category) == LABEL_FLAG || (*category) == EMPTY_CATEGORY_FLAG) {
         ans = validLabelORInstruction(word, INSTRUCTION_SEARCH); /*because dot counter is 0*/
-        if (ans) {
+        if (!ans) {
             (*category) = INSTRUCTION_FLAG;
             state = EXIT;}
 

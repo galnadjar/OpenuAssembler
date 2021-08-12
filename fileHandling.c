@@ -187,12 +187,11 @@ void readFile(FILE* fp,char* fileName) {
     char *lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
     char *wordSaved = NULL,*labelName = NULL;
 
-    symbolPtr symbolTableHead = (symbolPtr) calloc(1,sizeof(getSymbolSize()));
+    symbolPtr symbolTableHead = NULL;
     entryTablePtr entryTableHead = (entryTablePtr) calloc(1,sizeof(getExternSize()));
     codeImgPtr codeImgHead = NULL;
     dataImgPtr dataImgHead = NULL;
     labelTablePtr labelTableHead = (labelTablePtr) calloc(1,sizeof(getLabelTableSize()));
-
     while (1) {
 
         fgets(lineInput, MAX_ROW_LENGTH-1, fp);
@@ -260,7 +259,7 @@ void readFile(FILE* fp,char* fileName) {
             }
         }
 
-        resetFirstIterVars(&wasLabel, &wordSaved, &labelName,&i,&category);
+        resetIterVars(&wasLabel, &wordSaved, &labelName, &i, &category);
         line++;
         if(state == ERROR)
             wasError = 1;
@@ -270,7 +269,7 @@ void readFile(FILE* fp,char* fileName) {
 
 } /*end of readfile*/
 
-void resetFirstIterVars(int* wasLabel, char** wordSaved, char** labelName,int* i,int* catergory){
+void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* catergory){
     (*i) = 0;
     (*wasLabel) = 0;
     (*catergory) = EMPTY_CATEGORY_FLAG;

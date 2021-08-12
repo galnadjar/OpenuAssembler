@@ -16,8 +16,6 @@
 #define MVHI_FUNCT 2
 #define MVLO_FUNCT 3
 
-#define IMMED_CMD_MIN 15
-#define IMMED_CMD_MAX 18
 
 enum opcode {logic_arit,copyOC,addi = 10,subi,andi,ori,nori,bne,beq,blt,bgt,lb,sb,lw,sw,lh,sh,jmp = 30,la,call,stop = 63};
 typedef enum opcode opcode;
@@ -53,6 +51,7 @@ int checkFirstLetter(char* lineInput,int i);
 
 #define REG_OPTION 0
 #define LABEL_OPTION 1
-#define NO_LABEL "no"
+#define I_CMD_MIN_OPCODE 10
+#define I_CMD_MAX_OPCODE 24
 
 #endif //MAMAN14_INSTRUCTIONFUNCS_H

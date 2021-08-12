@@ -102,7 +102,7 @@ int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,cha
         temp->codeData.Jcmd.opcode = opcode;
         temp->codeData.Jcmd.reg = reg;
 
-        if(label) /*we would like to copy the label so we will know the ref*/
+        if(opcode >= J_CMDS_WITH_LABEL_MIN_OPCODE && opcode <= J_CMDS_WITH_LABEL_MAX_OPCODE && !reg) /*J cmd's that uses a label*/
             strcpy(temp->label,label);
 
         if(opcode == STOP_OPCODE)
@@ -136,7 +136,7 @@ int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead
         temp->line = line;
 
 
-        if(label)
+        if(opcode >= I_BRANCHING_MIN_OPCODE && opcode <= I_BRANCHING_MAX_OPCODE)
             strcpy(temp->label,label);
 
 
