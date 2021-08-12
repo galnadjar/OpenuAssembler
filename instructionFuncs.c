@@ -217,7 +217,7 @@ int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char* label)
                     i = analyzeLabel(lineInput,i,line,&label);
                     if (i) {
                         i = locAfterSpace(lineInput, i);
-                        if (i != MAX_ROW_LENGTH - 1){
+                        if (i != strlen(lineInput) - 1){
                             ERROR_EXTRANEOUS_END_OF_CMD(line);
                             state = ERROR;}
                     }

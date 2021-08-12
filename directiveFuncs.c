@@ -27,7 +27,7 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
 
     int dir = getDir(directive),state = VALID;
     char* word;
-    long* numLst;
+    long* numLst = NULL;
 
     switch (dir) {
 
@@ -38,6 +38,7 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
             case DB_DIR:
             case DW_DIR:
             default: /*case DH_DIR*/
+                numLst = (long*) calloc(strlen(lineInput)-1,sizeof(long));
                 state = analNumLst(i, lineInput, line, &numLst, dir);
                 break;
     }

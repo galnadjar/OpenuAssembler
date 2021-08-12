@@ -60,6 +60,8 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
             else
                 state = ERROR;
         }
+        if(numLst)
+            free(numLst);
 
         if(dir == ASCIZ_DIR){
             curr->address = *DC;
