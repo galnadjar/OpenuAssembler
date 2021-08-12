@@ -283,7 +283,7 @@ int setIcmdWithoutLabel(char* lineInput,int i,int line,int* rs,long* immed,int* 
 }
 
 int regNumCheck(int reg){
-    return reg >=1 && reg <= 31;
+    return reg >= MIN_REG_NUM && reg <= MAX_REG_NUM;
 }
 
 int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode){

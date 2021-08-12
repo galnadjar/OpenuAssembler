@@ -29,6 +29,8 @@ int getCodeLine(codeImgPtr ptr);
 codeImgPtr getNextCodeNode(codeImgPtr ptr);
 
 
+#define MIN_REG_NUM 0
+#define MAX_REG_NUM 31
 #define UNKNOWN_ADDRESS (-1)
 #define STOP_OPCODE 63
 #define I_BRANCHING_MIN_OPCODE 15
