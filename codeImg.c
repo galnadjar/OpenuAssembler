@@ -156,7 +156,7 @@ int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead
 }
 
 
-/*updates the i branch node immed field, if was valid update returns 1,otherwise returns 0*/
+/*updates the i branch node immed field, if was valid update returns 1,otherwise returns -1*/
 int updateImmed(codeImgPtr* codeHead,const char* label,long dest){
 
     int state = VALID;
@@ -183,6 +183,7 @@ int updateImmed(codeImgPtr* codeHead,const char* label,long dest){
     return state;
 }
 
+/*updates the j branching address field if the leaping destination is valid and returns 1, otherwise returns -1*/
 int updateJbranching(codeImgPtr* codeHead,char* label, long address){
 
     int state = VALID;

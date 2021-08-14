@@ -12,7 +12,7 @@
 
 #define IC_INITIAL_ADDRESS 100
 #define DC_INITIAL_ADDRESS 0
-#define UNKNOWN_ADDRESS (-1)
+#define EXT_LENGTH 3
 
 
 

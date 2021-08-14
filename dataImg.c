@@ -90,32 +90,36 @@ void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
         case ASCIZ_DIR:
         case DB_DIR:
 
-            fprintf(fp,"%02x",(int)ptr->data.display.d1);
+            fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter)++;
             break;
 
         case DH_DIR:
-            fprintf(fp,"%02x",(int)ptr->data.display.d1);
+            fprintf(fp,"%02X",(int)ptr->data.display.d1);
+            (*bytesCounter) ++;
+
             newLineOrTab(fp,bytesCounter,DC);
+            fprintf(fp,"%02X",(int)ptr->data.display.d2);
+            (*bytesCounter) ++;
 
-            fprintf(fp,"%02x",(int)ptr->data.display.d2);
-
-            (*bytesCounter) += 2;
             break;
 
         case DW_DIR:
-            fprintf(fp,"%02x",(int)ptr->data.display.d1);
+            fprintf(fp,"%02X",(int)ptr->data.display.d1);
+            (*bytesCounter) ++;
+
             newLineOrTab(fp,bytesCounter,DC);
+            fprintf(fp,"%02X",(int)ptr->data.display.d2);
+            (*bytesCounter) ++;
 
-            fprintf(fp,"%02x",(int)ptr->data.display.d2);
             newLineOrTab(fp,bytesCounter,DC);
+            fprintf(fp,"%02X",(int)ptr->data.display.d3);
+            (*bytesCounter) ++;
 
-            fprintf(fp,"%02x",(int)ptr->data.display.d3);
             newLineOrTab(fp,bytesCounter,DC);
+            fprintf(fp,"%02X",(int)ptr->data.display.d4);
+            (*bytesCounter) ++;
 
-            fprintf(fp,"%02x",(int)ptr->data.display.d4);
-
-            (*bytesCounter) += BYTES_LINE_LEN;
             break;
     }
 }
@@ -162,15 +166,13 @@ long getDirType(dataImgPtr ptr){
 }
 void newLineOrTab(FILE* fp,int* bytesCounter,long* DC){
 
-    if((*bytesCounter) % BYTES_LINE_LEN == 0){
-        (*DC) += BYTES_LINE_LEN;
+    if((*bytesCounter) == BYTES_LINE_LEN){
         fputc('\n',fp);
+        (*DC) += 4;
         (*bytesCounter) = 0;
     }
-    else{
-        if(!(*bytesCounter)) /*prints the address if it's the 0 byte*/
-            fprintf(fp,"%4ld",*DC);
 
-            fputc('\t',fp);
-    }
-}
+    if(!(*bytesCounter)) /*prints the address if it's the 0 byte*/
+        fprintf(fp,"%04ld",*DC);
+
+    fputc('\t',fp);}

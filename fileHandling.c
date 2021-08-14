@@ -66,7 +66,7 @@ void writeExtern(char* name, externTablePtr externPtr){
     char *externLabel = NULL,*extension;
     externLabel = getExternLabel(externPtr);
     if(externLabel){
-        extension = ".extension";
+        extension = ".ext";
         fp = createWriteFile(name, extension);
         if(fp)
             printExt(fp,externPtr);
@@ -100,7 +100,7 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
     labelTablePtr curr = (*labelTablehead);
     for(;curr;curr = getNextLabelNode(curr)){/*iter through label as arg dataStructure*/
         ans = analyzeTypeSymbol(curr, symbolTableHead, externTableHead, codeHead);
-        if(ans != ERROR)
+        if(!ans)/*label wasn't found in symboltable*/
             ans = analyzeEntrySymbol(curr,entryHead);
 
         if(ans == ERROR)
@@ -116,17 +116,21 @@ int analyzeEntrySymbol(labelTablePtr labelPtr,entryTablePtr* entryHead){
     int state = ERROR; /*meaning entry wasn't found yet*/
 
     entryTablePtr entryPtr = (*entryHead);
-    for(;entryPtr;entryPtr = getNextEntNode(entryPtr)){ /*iterating through the symbol table*/
+    for(;entryPtr;entryPtr = getNextEntNode(entryPtr)){ /*iterating through the entry table*/
         if(!strcmp(getEntryLabel(entryPtr), getLabelTableName(labelPtr))){
             state = VALID;
             setEntryAddress(&entryPtr,getLabelTableAddress(labelPtr));
         }
     }
+
+    if(state == ERROR)
+        ERROR_LABEL_EXISTENCE(getLabelTableLine(labelPtr),getLabelTableName(labelPtr));
+
     return state;
 }
 
 /*todo add a line number to every struct in the program so the messages would correspond to the line */
-/*returns 1 if all the label exists and corresponds to the matching rules,otherwise -1*/
+/*returns 1 if the label exists and corresponds to the rules,if not in symbol table at all returns 0, otherwise -1*/
 int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead){
 
     int state = VALID,found = 0;
@@ -161,9 +165,8 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
     }
 
     if(!found){
-        state = ERROR;
-        ERROR_LABEL_EXISTENCE(getLabelTableLine(labelPtr),getLabelTableName(labelPtr));}
-
+        state = EXIT;
+    }
 
     return state;
 }
@@ -295,6 +298,7 @@ FILE* createWriteFile(char* name,char* extension){
     fileName = (char*) calloc(strlen(name) + strlen(extension), sizeof(char));
 
     if(fileName){
+        name[strlen(name)-EXT_LENGTH] = '\0';
         strcpy(fileName, name);
         strcat(fileName, extension);
         fp = fopen(fileName,"w");
@@ -327,17 +331,15 @@ void printDataImg(FILE* fp, dataImgPtr dataPtr){
     while(curr){
         newLineOrTab(fp,&bytesCounter,&DC);
 
-        if(!bytesCounter) /*meaning a new line that needs new address*/
-            newLineOrTab(fp,&bytesCounter,&DC);
-
         printDataDisplay(fp,curr,&bytesCounter,&DC);
+
         curr = getNextDataNode(curr);}
 }
 
 void printCodeImg(FILE* fp,codeImgPtr codePtr){
 
     while(codePtr){
-        fprintf(fp,"%04ld\t%02x\t%02x\t%02x\t%02x\n",getCodeAddress(codePtr),getCodeDisplay(codePtr,A_BYTE),
+        fprintf(fp,"%04ld\t%02X\t%02X\t%02X\t%02X\n",getCodeAddress(codePtr),getCodeDisplay(codePtr,A_BYTE),
                 getCodeDisplay(codePtr,B_BYTE),getCodeDisplay(codePtr,C_BYTE),getCodeDisplay(codePtr,D_BYTE));
         codePtr = getNextCodeNode(codePtr);
     }
