@@ -38,7 +38,6 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
             case DB_DIR:
             case DW_DIR:
             default: /*case DH_DIR*/
-                numLst = (long*) calloc(strlen(lineInput)-1,sizeof(long));
                 state = analNumLst(i, lineInput, line, &numLst, dir);
                 break;
     }
@@ -89,6 +88,7 @@ int analAsciz(int i, char* lineInput, int line, char** word){
 
 /*returns 1 if was valid operation, otherwise 0*/
 int analNumLst(int i, char* lineInput, int line, long** numLst, int dir){
+    (*numLst) = (long*) calloc(strlen(lineInput)-1,sizeof(long));
     int numInd = 0,state = VALID;
     long num,minVal,maxVal;
     adjustValues(&minVal,&maxVal,dir);

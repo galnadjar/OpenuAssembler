@@ -70,8 +70,9 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
             curr->data.letter.ch = 0;
             (*DC)++;}
 
-        else
-            free(curr->next);
+        else{
+            free(temp);
+            curr = NULL;}
 
         if(dcBefore == DC_INITIAL)
             (*imgHead) = arrayHead;
