@@ -54,12 +54,12 @@ int handleEntNode(char* label,entryTablePtr* entryHead,int line){
         strcpy(tempEnt->label,label);
         tempEnt->line = line;
 
-        if(!getEntryLine(*entryHead)){
+        if(getEntryLine(*entryHead)){
             for(currEnt = (*entryHead);currEnt->next;currEnt = currEnt->next);
             currEnt->next = tempEnt;}
 
         else
-            entryHead = &tempEnt;
+            (*entryHead) = tempEnt;
     }
     else
         state = ERROR;

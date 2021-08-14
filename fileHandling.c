@@ -235,7 +235,7 @@ void readFile(FILE* fp,char* fileName) {
 
                     /* case extern / entry*/
                     if (category == EXTERN_FLAG || category == ENTRY_FLAG) {
-                        i = analyzeLabel(lineInput,i,line,(char**)&labelName);
+                        i = analyzeLabel(lineInput,i,line,&labelName);
 
                         if (i != ERROR) {
                             i = locAfterSpace(lineInput, i);
@@ -262,10 +262,10 @@ void readFile(FILE* fp,char* fileName) {
 
                     else { /*category == INSTRUCTION_FLAG*/
                         state = checkInsArgs(lineInput, wordSaved, i, line, &IC, &codeImgHead,&labelTableHead);
-                        if (state && wasLabel) {
+                        if (state && wasLabel)
                             state = addSymbol(&symbolTableHead, labelName, IC, CODE_AT, line);
-                            if(state != ERROR)
-                                IC += 4;}
+                        if(state != ERROR)
+                            IC += 4;
                     }
                 }
             }
@@ -276,6 +276,8 @@ void readFile(FILE* fp,char* fileName) {
         if(state == ERROR)
             wasError = 1;
     }
+    free(lineInput);
+
     if(!wasError) /*no reason for second iteration if errors were found at the first 1*/
         secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC,IC+DC,fileName);
 
