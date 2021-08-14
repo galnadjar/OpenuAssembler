@@ -98,15 +98,19 @@ void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
 
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter)++;
+            newLineOrTab(fp,bytesCounter,DC);
+
             break;
 
         case DH_DIR:
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter) ++;
 
+
             newLineOrTab(fp,bytesCounter,DC);
             fprintf(fp,"%02X",(int)ptr->data.display.d2);
             (*bytesCounter) ++;
+            newLineOrTab(fp,bytesCounter,DC);
 
             break;
 
@@ -126,6 +130,7 @@ void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
             fprintf(fp,"%02X",(int)ptr->data.display.d4);
             (*bytesCounter) ++;
 
+            newLineOrTab(fp,bytesCounter,DC);
             break;
     }
 }
@@ -172,13 +177,11 @@ long getDirType(dataImgPtr ptr){
 }
 void newLineOrTab(FILE* fp,int* bytesCounter,long* DC){
 
-    if((*bytesCounter) == BYTES_LINE_LEN){
+    if((*bytesCounter) % BYTES_LINE_LEN == 0){
         fputc('\n',fp);
-        (*DC) += 4;
-        (*bytesCounter) = 0;
-    }
+        (*DC) += BYTES_LINE_LEN;
+        fprintf(fp,"%04ld\t",*DC);}
 
-    if(!(*bytesCounter)) /*prints the address if it's the 0 byte*/
-        fprintf(fp,"%04ld",*DC);
-
-    fputc('\t',fp);}
+    else
+        fputc('\t',fp);
+}

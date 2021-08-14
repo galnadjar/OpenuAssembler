@@ -330,11 +330,10 @@ void printDataImg(FILE* fp, dataImgPtr dataPtr){
     dataImgPtr curr = dataPtr;
     long DC = getDataAddress(dataPtr);
     int bytesCounter = 0;
+    fprintf(fp,"%04ld\t",DC);
     while(curr){
-        newLineOrTab(fp,&bytesCounter,&DC);
-
+//        newLineOrTab(fp,&bytesCounter,&DC);
         printDataDisplay(fp,curr,&bytesCounter,&DC);
-
         curr = getNextDataNode(curr);}
 }
 
