@@ -15,7 +15,7 @@ typedef enum type{
     I_BRANCHING
 }type;
 
-int addToLabelTable(labelTablePtr* head, char* labelName, long address,type branch);
+int addToLabelTable(labelTablePtr* head, char* labelName, long address,type branch,int line);
 int getLabelBranch(labelTablePtr ptr);
 int getLabelTableSize();
 long getLabelTableAddress(labelTablePtr ptr);

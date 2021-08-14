@@ -16,7 +16,7 @@ labelTablePtr getNextLabelNode(labelTablePtr ptr){
 }
 
 
-int addToLabelTable(labelTablePtr* head, char* labelName, long address,type branch){
+int addToLabelTable(labelTablePtr *head, char* labelName, long address,type branch,int line){
     int state = VALID;
 
     labelTablePtr p = (*head);
@@ -28,10 +28,10 @@ int addToLabelTable(labelTablePtr* head, char* labelName, long address,type bran
         strcpy(temp->labelName,labelName);
         temp->address = address;
         temp->branch = branch;
+        temp->line = line;
 
         if(!(getLabelBranch(p))){/*head is empty*/
-            strcpy(p->labelName,temp->labelName);
-            p->address = temp->address;}
+            (*head) = temp;}
 
         else{
             for(;p->next;p = p->next);

@@ -18,7 +18,7 @@ typedef struct externTable{
 
 }externTable;
 
-int addEntry(entryTablePtr* entryHead,char* label,long address,int line){
+int addEntry(entryTablePtr* entryHead,char* label,int line){
 
     entryTablePtr ptrEnt;
     int state = VALID;
@@ -133,5 +133,8 @@ entryTablePtr getNextEntNode(entryTablePtr ptr){
     return ptr->next;
 }
 
+int getExternLine(externTablePtr ptr){
+    return ptr->line;
+}
 
 

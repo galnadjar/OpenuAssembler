@@ -18,7 +18,7 @@ typedef struct externTable* externTablePtr;
 
 int handleEntNode(char* label,entryTablePtr* entryHead,int line);
 entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word);
-int addEntry(entryTablePtr* entryHead,char* label,long address,int line);
+int addEntry(entryTablePtr* entryHead,char* label,int line);
 
 int addToExtTable(externTablePtr * tableHead, char* word, long address);
 int getEntryLine(entryTablePtr ptr);
@@ -31,6 +31,7 @@ long getEntAddress(entryTablePtr ptr);
 externTablePtr getNextExtNode(externTablePtr ptr);
 entryTablePtr getNextEntNode(entryTablePtr ptr);
 void setEntryAddress(entryTablePtr* ptr,long address);
+int getExternLine(externTablePtr ptr);
 
 
 

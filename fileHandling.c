@@ -37,10 +37,10 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
     if(state != ERROR){
 
         writeOB(name, *dataImgHead,*codeImgHead,DCF,ICF);
-        if(getEntryLabel(*entryTableHead))
+        if(!getEntryLine(*entryTableHead)) /*check if head is empty*/
             writeEntry(name,*entryTableHead);
 
-         if(getExternLabel(externTableHead))
+        if(!getExternLine(externTableHead))/*check if head is empty*/
             writeExtern(name,externTableHead);
     }
 } /*end of readFile*/
@@ -98,7 +98,7 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
     int state = VALID,ans;
 
     labelTablePtr curr = (*labelTablehead);
-    for(;curr;curr = getNextLabelNode(curr)){
+    for(;curr;curr = getNextLabelNode(curr)){/*iter through label as arg dataStructure*/
         ans = analyzeTypeSymbol(curr, symbolTableHead, externTableHead, codeHead);
         if(ans != ERROR)
             ans = analyzeEntrySymbol(curr,entryHead);
@@ -132,12 +132,12 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
     int state = VALID,found = 0;
     symbolPtr symPtr = (*symbolHead);
 
-    for(;symPtr;symPtr = getSymbolNextNode(symPtr)){ /*iterating through the symbol table*/
+    for(;!found && symPtr;symPtr = getSymbolNextNode(symPtr)){ /*iterating through the symbol table*/
 
-        if(!(strcmp(getSymbolLabel(symPtr),getLabelTableName(labelPtr)))){ /*case they have same name*/
+        if(!(strcmp(getSymbolLabel(symPtr),getLabelTableName(labelPtr)))){ /*matching name between symbol table and label table*/
             found = 1;
             if(getSymbolType(symPtr) == EXTERN_AT){
-                if(getLabelBranch(labelPtr) == J_BRANCHING){
+                if(getLabelBranch(labelPtr) == J_BRANCHING){ /*la/call/jmp*/
                     state = addToExtTable(externHead, getLabelTableName(labelPtr), getLabelTableAddress(labelPtr));
                     if(state == ERROR)
                         ERROR_MEMORY_MAXED_OUT(getLabelTableLine(labelPtr));
@@ -150,8 +150,12 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
             }
 
             else{ /*not external*/
-                if(getLabelBranch(labelPtr) == I_BRANCHING)/*the argument is ibranching type so we update its field*/
-                    updateImmed(codeHead, getLabelTableName(labelPtr), getSymbolAddress(symPtr));
+                if(getLabelBranch(labelPtr) == J_BRANCHING)
+                    state = updateJbranching(codeHead,getLabelTableName(labelPtr), getSymbolAddress(symPtr));
+
+
+                else if(getLabelBranch(labelPtr) == I_BRANCHING)/*the argument immed field is updated*/
+                    state = updateImmed(codeHead, getLabelTableName(labelPtr), getSymbolAddress(symPtr));
             }
         }
     }
@@ -206,6 +210,7 @@ void readFile(FILE* fp,char* fileName) {
 
         if (state) {/*meaning its not comment and neither empty line*/
 
+            /*todo already allocated labelName in other place i think,check if this func is mandatory*/
             allocVars(&labelName,&wordSaved);
             i = parseCategory(&i, lineInput, &wordSaved, &category, line);/*parses the category of the first word*/
 
@@ -234,7 +239,7 @@ void readFile(FILE* fp,char* fileName) {
 
                             if (i == strlen(lineInput)-1) {
                                 if (category == ENTRY_FLAG)
-                                    state = addEntry(&entryTableHead, labelName,UNKNOWN_ADDRESS, line);
+                                    state = addEntry(&entryTableHead, labelName, line);
 
                                 else
                                     state = addSymbol(&symbolTableHead,labelName,0,EXTERN_AT,line);
@@ -273,18 +278,16 @@ void readFile(FILE* fp,char* fileName) {
 
 } /*end of readfile*/
 
-void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* catergory){
+void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* category){
     (*i) = 0;
     (*wasLabel) = 0;
-    (*catergory) = EMPTY_CATEGORY_FLAG;
+    (*category) = EMPTY_CATEGORY_FLAG;
 
     if(*labelName)
         free(*labelName);
     if(*wordSaved)
         free(*wordSaved);
 }
-
-
 
 FILE* createWriteFile(char* name,char* extension){
     FILE* fp = NULL;

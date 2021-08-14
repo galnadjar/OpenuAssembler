@@ -97,16 +97,12 @@ int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,cha
         temp->opcode = opcode;
         temp->nodeAddress = IC;
         temp->line = line;
-
-
+        temp->codeData.Jcmd.address = address;
         temp->codeData.Jcmd.opcode = opcode;
         temp->codeData.Jcmd.reg = reg;
 
         if(opcode >= J_CMDS_WITH_LABEL_MIN_OPCODE && opcode <= J_CMDS_WITH_LABEL_MAX_OPCODE && !reg) /*J cmd's that uses a label*/
             strcpy(temp->label,label);
-
-        if(opcode == STOP_OPCODE)
-            temp->codeData.Jcmd.address = 0;
 
 
         if(IC > 100){
@@ -134,21 +130,16 @@ int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead
         temp->nodeAddress = IC;
         temp->opcode = opcode;
         temp->line = line;
-
-
-        if(opcode >= I_BRANCHING_MIN_OPCODE && opcode <= I_BRANCHING_MAX_OPCODE)
-            strcpy(temp->label,label);
-
-
         temp->codeData.Icmd.opcode = opcode;
         temp->codeData.Icmd.rs = rs;
         temp->codeData.Icmd.rt = rt;
 
-        if(!label)/*reg and immed number requested*/
+        if(opcode >= I_BRANCHING_MIN_OPCODE && opcode <= I_BRANCHING_MAX_OPCODE)
+            strcpy(temp->label,label);
+
+        else
             temp->codeData.Icmd.immed = immed; /*reg number*/
 
-        else /*label used*/
-            temp->nodeAddress *= (-1);
 
         if(IC > 100){
             for (; curr->next; curr = curr->next);
@@ -164,20 +155,59 @@ int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead
     return state;
 }
 
-/*updates the i branch node immed field*/
-void updateImmed(codeImgPtr* codeHead,const char* label,long address){
 
-    int state = 1;
-    long immed;
+/*updates the i branch node immed field, if was valid update returns 1,otherwise returns 0*/
+int updateImmed(codeImgPtr* codeHead,const char* label,long dest){
+
+    int state = VALID;
+    long src;
     codeImgPtr curr = (*codeHead);
 
-    for(;curr && state;curr = curr->next){
+    for(;curr && state == VALID;curr = curr->next){
         if(!strcmp(curr->label,label)){
-            immed = curr->nodeAddress;
-            curr->codeData.Icmd.immed = address + immed;
-            state = 0;}
+            src = curr->nodeAddress;
+            state = checkTwoByteSize(dest - src);
+            if(state)
+                curr->codeData.Icmd.immed = dest - src;
+            else{
+                ERROR_JUMP_OUT_OF_BOUNDS(getCodeLine(curr));
+                state = ERROR;}
+
+            if(state == VALID)/*valid label was found and immed was updated properly*/
+                state = EXIT;}
     }
+
+    if(state == EXIT)
+        state = 1;
+
+    return state;
 }
+
+int updateJbranching(codeImgPtr* codeHead,char* label, long address){
+
+    int state = VALID;
+    codeImgPtr curr = (*codeHead);
+
+    for(;curr && state == VALID;curr = curr->next){
+        if(!strcmp(curr->label,label)){
+            if(address <= MAX_JUMP_LENGTH)
+                curr->codeData.Jcmd.address = address;
+            else{
+                state = ERROR;
+                ERROR_JUMP_OUT_OF_BOUNDS(curr->line);
+            }
+
+            state = EXIT;
+        }
+    }
+
+    if(state == EXIT)
+        state = 1;
+
+    return state;
+
+}
+
 
 int getCodeDisplay(codeImgPtr ptr ,byteSelect byte){
 

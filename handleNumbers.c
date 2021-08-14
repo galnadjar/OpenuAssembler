@@ -10,7 +10,7 @@ int handleNum(long* num, int ch, int line, int* firstDigit,const long minVal,con
 
     if(!state){
         state = ERROR;
-        ERROR_NUMBER_TOO_LARGE(line);}
+        ERROR_NUMBER_OUT_OF_BOUNDS(line);}
 
     else{
         (*num) = ((*num)*10) + (ch - '0');
@@ -72,9 +72,10 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
 }
 
 int checkTwoByteSize(long num){
-
     return (num >= MIN_TWO_BYTES_SIZE && num <= MAX_TWO_BYTES_SIZE);
 }
+
+
 
 /*check if the number will stay in the num range, returns 1 if so,otherwise returns 0*/
 int checkValidNumRange(int ch, long num,const long minRange,const long maxRange){

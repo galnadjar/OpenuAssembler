@@ -53,12 +53,14 @@
 #define ERROR_NUMBER_OUT_OF_BOUNDS(X) printf("ERROR: In line %d,the number that was given was out of bounds\n",X)
 
 #define ERROR_MISSING_QUOTATION(X) printf("ERROR: In line %d,quotation were missing from the argument\n",X)
-#define ERROR_NUMBER_TOO_LARGE(X) printf("ERROR: In line %d,the number that was given was too big\n",X)
 #define ERROR_ATTRIBUTE_ASSIGN(X) printf("ERROR: In line %d,an invalid attribute assign to an existing label was found\n",X)
 
 #define ERROR_LABEL_EXISTENCE(X,Y) printf("ERROR: In line %d the label \"%s\" was used but was never created\n",X,Y)
 
 #define ERROR_EXTERN_I_BRANCH(X,Y) printf("ERROR: In line %d the label \"%s\" was defined as external yet tried to be jumped to locally\n",X,Y)
+
+#define ERROR_JUMP_OUT_OF_BOUNDS(X) printf("ERROR: In line %d the jumping destination was out of bounds",X)
+
 
 #define ERROR_MEMORY_ALLOCATION(X) printf("ERROR: system couldn't allocate space for 1 of \"%s\" files on the disk\n",X)
 

@@ -153,13 +153,14 @@ int handleJargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr*
 
     int state = VALID;
     int reg;
-    long address;
+    long address = 0;
     char* label = NULL;
     state = setJcmdReg(lineInput,i,line,&reg,&address,opcode,&label);
 
     if(state != ERROR){
         if(label)
-            addToLabelTable(labelTableHead,label,*IC,J_BRANCHING);
+            addToLabelTable(labelTableHead,label,*IC,J_BRANCHING,line);
+
         state = addJCodeNode(reg,*IC,address,opcode,imgHead,label,line);
         if(!state)
             ERROR_MEMORY_MAXED_OUT(line);}
@@ -180,7 +181,7 @@ int handleIargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr*
         label = calloc(MAX_LABEL_LENGTH+1,sizeof(char));
         if(label){
             state = setIcmdWithLabel(lineInput,i,line,&rs,&rt,label);
-            addToLabelTable(labelTableHead,label,*IC,I_BRANCHING);
+            addToLabelTable(labelTableHead,label,*IC,I_BRANCHING,line);
         }
         else{
             state = ERROR;
@@ -386,7 +387,7 @@ int analJmp(char* lineInput,int i,int line,int* reg,long* address,char** labelNa
     switch (option) {
 
         case REG_OPTION:
-            state = checkAndSetReg(lineInput,i,line,address,0); /*todo check if thats really what i tried to pass or is it the reg*/
+            state = checkAndSetReg(lineInput,i,line,(int*)address,0);
             if(state != ERROR)
                 (*reg) = 1;
             break;
