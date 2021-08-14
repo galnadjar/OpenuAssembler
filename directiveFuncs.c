@@ -103,8 +103,10 @@ int analNumLst(int i, char* lineInput, int line, long** numLst, int dir){
 
             else{
                 i = commaAfterSpace(lineInput,i); /*looks for comma since its not the last number*/
-                if(i > 0) /*a comma was found, then we can add the number*/
+                if(i > 0){ /*a comma was found, then we can add the number*/
                     (*numLst)[numInd++] = num;
+                    i--;
+                }
 
                 else{
                     ERROR_MISSING_COMMA(line);
@@ -122,12 +124,12 @@ int analNumLst(int i, char* lineInput, int line, long** numLst, int dir){
 }
 
 
-/*check if last number and if ended properly, returns 0 if so, otherwise return -1*/
+/*check if last num,if not returns 1,if last and ended with comma returns -1,otherwise if proper last number returns 0*/
 int checkLastNum(char* lineInput,int i,int line){
     int state = VALID;
 
-    if(locAfterSpace(lineInput,i) == strlen(lineInput) -1){
-        if(lineInput[i-1] != ','){/*check if the last number ended with a comma*/
+    if(locAfterSpace(lineInput,i+1) >= strlen(lineInput) -1){ /*is the last number*/
+        if(lineInput[i] != ','){/*check if the last number ended with a comma*/
             state = EXIT;}
 
         else{

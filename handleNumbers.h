@@ -16,7 +16,7 @@
 
 #define MINUS_OP 2
 typedef enum{
-    ASCIZ_DIR,
+    ASCIZ_DIR = 1,
     DH_DIR,
     DW_DIR,
     DB_DIR

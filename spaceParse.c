@@ -46,7 +46,7 @@ int commaAfterSpace(char* lineInput, int i){
 
     int state = VALID;
     int ch;
-    for(;i < MAX_ROW_LENGTH-1 && state == VALID;i++) {
+    for(;i < strlen(lineInput)-1 && state == VALID;i++) {
 
         ch = (int) lineInput[i];
         if (isspace(ch))
