@@ -447,7 +447,7 @@ int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq){
                 i = locAfterSpace(lineInput, i) - 1;
 
             else/*handles a space that came after a '$'*/
-            state = handleRegSpace(digit,reg,regNum,line);
+                state = handleRegSpace(digit,reg,regNum,line);
         }
         else if(isdigit(ch))
             state = handleRegDigit(regSign,&digit,&regNum,ch,line);
@@ -469,7 +469,7 @@ int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq){
         }
     }
 
-    if(state == ERROR || regNum == 0)
+    if(state == ERROR)
         i = ERROR;
 
     return i;

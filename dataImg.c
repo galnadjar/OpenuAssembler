@@ -98,19 +98,18 @@ void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
 
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter)++;
-            newLineOrTab(fp,bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC);
 
             break;
 
         case DH_DIR:
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter) ++;
+            newLineOrTab(fp,*bytesCounter,DC);
 
-
-            newLineOrTab(fp,bytesCounter,DC);
             fprintf(fp,"%02X",(int)ptr->data.display.d2);
             (*bytesCounter) ++;
-            newLineOrTab(fp,bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC);
 
             break;
 
@@ -118,19 +117,19 @@ void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter) ++;
 
-            newLineOrTab(fp,bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC);
             fprintf(fp,"%02X",(int)ptr->data.display.d2);
             (*bytesCounter) ++;
 
-            newLineOrTab(fp,bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC);
             fprintf(fp,"%02X",(int)ptr->data.display.d3);
             (*bytesCounter) ++;
 
-            newLineOrTab(fp,bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC);
             fprintf(fp,"%02X",(int)ptr->data.display.d4);
             (*bytesCounter) ++;
+            newLineOrTab(fp,*bytesCounter,DC);
 
-            newLineOrTab(fp,bytesCounter,DC);
             break;
     }
 }
@@ -175,9 +174,9 @@ dataImgPtr getNextDataNode(dataImgPtr ptr){
 long getDirType(dataImgPtr ptr){
     return ptr->type;
 }
-void newLineOrTab(FILE* fp,int* bytesCounter,long* DC){
+void newLineOrTab(FILE* fp,const int bytesCounter,long* DC){
 
-    if((*bytesCounter) % BYTES_LINE_LEN == 0){
+    if(bytesCounter % BYTES_LINE_LEN == 0){
         fputc('\n',fp);
         (*DC) += BYTES_LINE_LEN;
         fprintf(fp,"%04ld\t",*DC);}

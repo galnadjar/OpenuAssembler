@@ -213,7 +213,6 @@ void readFile(FILE* fp,char* fileName) {
 
         if (state) {/*meaning its not comment and neither empty line*/
 
-            /*todo already allocated labelName in other place i think,check if this func is mandatory*/
             allocVars(&labelName,&wordSaved);
             i = parseCategory(&i, lineInput, &wordSaved, &category, line);/*parses the category of the first word*/
 
@@ -221,7 +220,7 @@ void readFile(FILE* fp,char* fileName) {
                 /*case label*/
                 if (category == LABEL_FLAG){
                     wasLabel = 1;
-                    if(isspace(lineInput[i])) { /*check that after the ':' theres a spacing*/ /*todo check if thats needed*/
+                    if(isspace(lineInput[i])) { /*check that after the ':' theres a spacing*/
                         strcpy(labelName,wordSaved);
                         i = parseCategory(&i, lineInput, &wordSaved, &category, line);}
 
@@ -279,7 +278,7 @@ void readFile(FILE* fp,char* fileName) {
     free(lineInput);
 
     if(!wasError) /*no reason for second iteration if errors were found at the first 1*/
-        secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC,IC+DC,fileName);
+        secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC + DC,IC,fileName);
 
 } /*end of readfile*/
 
@@ -320,19 +319,18 @@ void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,con
     if(fp){
         printCounters(fp,ICF,DCF);
         printCodeImg(fp,codePtr);
-        printDataImg(fp,dataPtr);
+        printDataImg(fp,dataPtr,ICF);
     }
 }
 
 
-void printDataImg(FILE* fp, dataImgPtr dataPtr){
+void printDataImg(FILE* fp, dataImgPtr dataPtr, long ICF){
 
     dataImgPtr curr = dataPtr;
-    long DC = getDataAddress(dataPtr);
+    long DC = ICF;
     int bytesCounter = 0;
     fprintf(fp,"%04ld\t",DC);
     while(curr){
-//        newLineOrTab(fp,&bytesCounter,&DC);
         printDataDisplay(fp,curr,&bytesCounter,&DC);
         curr = getNextDataNode(curr);}
 }
@@ -346,8 +344,6 @@ void printCodeImg(FILE* fp,codeImgPtr codePtr){
     }
 }
 
-
-
 void printCounters(FILE* fp ,long IC, long DC){
-        fprintf(fp,"\t\t%ld\t%ld\n",IC-IC_INITIAL_ADDRESS,DC);
+        fprintf(fp,"\t\t%ld\t%ld\n",IC-IC_INITIAL_ADDRESS,DC-IC);
 }
