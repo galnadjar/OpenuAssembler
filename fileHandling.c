@@ -86,7 +86,7 @@ void printEnt(FILE* fp,entryTablePtr entryPtr){
 
     entryTablePtr curr = entryPtr;
     while(curr){
-        fprintf(fp,"%04ld\t%s\n",getEntAddress(curr), getEntryLabel(curr));
+        fprintf(fp,"%s\t%04ld\n", getEntryLabel(curr),getEntAddress(curr));
         curr = getNextEntNode(curr);
     }
 }
@@ -187,6 +187,7 @@ void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF){
     while(currSymbol){
         if(getSymbolType(currSymbol) == DATA_AT)
             updateSymbolAddress(&currSymbol,ICF);
+        currSymbol = getSymbolNextNode(currSymbol);
     }
 }
 
@@ -327,7 +328,7 @@ void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,con
     if(fp){
         printCounters(fp,ICF,DCF);
         printCodeImg(fp,codePtr);
-        printDataImg(fp,dataPtr,ICF);
+//        printDataImg(fp,dataPtr,ICF);/*todo undo this*/
     }
 }
 

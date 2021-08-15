@@ -66,13 +66,12 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
             free(word);
 
         if(dir == ASCIZ_DIR){
+            curr->type = ASCIZ_DIR;
             curr->address = *DC;
-            curr->data.letter.ch = 0;
             (*DC)++;}
 
-        else{
+        else
             free(temp);
-            curr = NULL;}
 
         if(dcBefore == DC_INITIAL)
             (*imgHead) = arrayHead;
