@@ -20,7 +20,7 @@ int handleNum(long* num, int ch, int line, int* firstDigit,const long minVal,con
 }
 
 /*the function returns the index after the comma/space if the number was set properly,otherwise returns -1*/
-int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,const long minVal,const long maxVal){
+int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,const long minVal,const long maxVal,int* comma){
     int state = VALID,ch;
     long sum = 0;
     int operator = 0,firstDigit = 0;
@@ -35,8 +35,10 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
 
             else{
                 state = handleNumSpace(&sum, operator, firstDigit, line);
-                if(state == EXIT)
-                    (*num) = sum;}
+                if(state == EXIT){
+                    (*num) = sum;
+                    (*comma) = 0;}
+            }
         }
 
         else if(ch == ','){
@@ -44,7 +46,8 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
             if(state == EXIT){
                 firstDigit = 0;
                 (*num) = sum;
-                i--;}
+                i--;
+                (*comma) = 1;}
         }
 
 
@@ -63,7 +66,8 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
     if(firstDigit && i == strlen(lineInput) -1){/*in a number*/
         state = handleNumSpace(&sum, operator, firstDigit, line);
         if(state == EXIT)
-            (*num) = sum;}
+            (*num) = sum;
+            (*comma) = 0;}
 
     if(state == ERROR)
         i = ERROR;

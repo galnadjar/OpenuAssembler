@@ -26,24 +26,26 @@ int getDir(char* directive){
 int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataImgPtr* ImgHead){
 
     int dir = getDir(directive),state = VALID;
-    char* word;
+    char* word = NULL;
     long* numLst = NULL;
+    int wordCnt,numberCnt = 0;
 
     switch (dir) {
 
         case ASCIZ_DIR:
             state = analAsciz(i, lineInput, line, &word);
+            wordCnt = (int)strlen(word);
             break;
 
             case DB_DIR:
             case DW_DIR:
             default: /*case DH_DIR*/
-                state = analNumLst(i, lineInput, line, &numLst, dir);
+                state = analNumLst(i, lineInput, line, &numLst, dir,&numberCnt);
                 break;
     }
 
     if(state){
-        state = addDirNodes(ImgHead, word, numLst, dir, DC,line);
+        state = addDirNodes(ImgHead, word, numLst, dir, DC,line,(dir == ASCIZ_DIR?wordCnt:numberCnt));
         if(state == ERROR){
             state = 0;
             ERROR_MEMORY_MAXED_OUT(line);}
@@ -68,7 +70,7 @@ int analAsciz(int i, char* lineInput, int line, char** word){
 //            else if(ch == '\')
             else
                 (*word)[wordInd++] = (char)ch;
-        }
+            }
 
         if(i == strlen(lineInput) -1 && state == VALID){ /*reached the end without finding quotation mark*/
             state = ERROR;
@@ -87,49 +89,61 @@ int analAsciz(int i, char* lineInput, int line, char** word){
 }
 
 /*returns 1 if was valid operation, otherwise 0*/
-int analNumLst(int i, char* lineInput, int line, long** numLst, int dir){
-    (*numLst) = (long*) calloc(strlen(lineInput)-1,sizeof(long));
+int analNumLst(int i, char* lineInput, int line, long** numLst, int dir,int* numberCnt){
+
     int numInd = 0,state = VALID;
     long num,minVal,maxVal;
-    adjustValues(&minVal,&maxVal,dir);
+    int comma = 0;
+    (*numLst) = (long*) calloc(strlen(lineInput)-1,sizeof(long));
 
-    for(;i < strlen(lineInput) -1 && state == VALID;i++){
-        i = checkAndSetNum(lineInput,i,line,&num,1,minVal,maxVal); /*looks for first number and save it if valid*/
-        if(i != ERROR){
+    if(*numLst){
 
-            state = checkLastNum(lineInput,i,line);
-            if(state == EXIT)
-                (*numLst)[numInd] = num;
+        adjustValues(&minVal,&maxVal,dir);
 
-            else{
-                i = commaAfterSpace(lineInput,i); /*looks for comma since its not the last number*/
-                if(i > 0){ /*a comma was found, then we can add the number*/
-                    (*numLst)[numInd++] = num;
-                    i--;
-                }
+        for(;i < strlen(lineInput) -1 && state == VALID;i++){
+            i = checkAndSetNum(lineInput,i,line,&num,1,minVal,maxVal,&comma); /*looks for first number and save it if valid*/
+            if(i != ERROR){
+                (*numberCnt)++;
+                state = checkLastNum(lineInput,i,line,comma);
+                if(state == EXIT)
+                    (*numLst)[numInd] = num;
 
                 else{
-                    ERROR_MISSING_COMMA(line);
-                    state = ERROR;}
+                    i = commaAfterSpace(lineInput,i); /*looks for comma since its not the last number*/
+                    if(i > 0){ /*a comma was found, then we can add the number*/
+                        (*numLst)[numInd++] = num;
+                        i--;
+                    }
+
+                    else{
+                        ERROR_MISSING_COMMA(line);
+                        state = ERROR;}
+                }
             }
         }
-    }
-    if(state == EXIT)
-        state = VALID;
+        if(state == EXIT)
+            state = VALID;
 
-    else
-        state = 0;
+        else
+            state = 0;
+    }
+
+    else{
+        state = ERROR;
+        ERROR_MEMORY_MAXED_OUT(line);
+    }
+
 
     return state;
 }
 
 
 /*check if last num,if not returns 1,if last and ended with comma returns -1,otherwise if proper last number returns 0*/
-int checkLastNum(char* lineInput,int i,int line){
+int checkLastNum(char* lineInput,int i,int line,int comma){
     int state = VALID;
 
     if(locAfterSpace(lineInput,i+1) >= strlen(lineInput) -1){ /*is the last number*/
-        if(lineInput[i] != ','){/*check if the last number ended with a comma*/
+        if(!comma){/*check if the last number ended with a comma*/
             state = EXIT;}
 
         else{

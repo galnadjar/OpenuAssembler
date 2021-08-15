@@ -31,14 +31,14 @@ int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode
 int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,char** label);
 
 
-int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
+int checkInsArgs(char* lineInput,char* instruction,char** labelName,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
 
 int handleRargs(char* lineInput, int i, int line,long* IC,int opcode,int funct,codeImgPtr* imgHead);
-int handleJargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
-int handleIargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
+int handleJargs(char* lineInput,char** labelName, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
+int handleIargs(char* lineInput,char** labelName, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
 
 
-int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char * label);
+int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char** label);
 int setIcmdWithoutLabel(char* lineInput,int i,int line,int* rs,long* immed,int* rt);
 
 int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq);

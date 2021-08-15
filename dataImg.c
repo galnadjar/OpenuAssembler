@@ -37,7 +37,7 @@ typedef struct dataImg{
 }dataImg;
 
 /*adds directive nodes,returns 1 if memory allocated properly,and -1 otherwise*/
-int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC,int line){
+int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC,int line,int counter){
 
     int i,state = VALID,dcBefore = *DC;
     dataImgPtr arrayHead = (dataImgPtr) calloc(1, sizeof(dataImg));
@@ -45,20 +45,21 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
     dataImgPtr temp;
 
     if(arrayHead){
-        /*for asciz: until the word list ends. for the rest: until the num list ends*/
-        for(i = 0;(dir == ASCIZ_DIR? word[i]:numLst[i]) && state == VALID;i++,curr = curr->next){
+        for(i = 0;i < counter && state == VALID;i++,curr = curr->next){
             curr->address = *DC;
             curr->type = dir;
             curr->line = line;
             fillImgData(dir,&curr,word,numLst,i,DC);
 
             /*set up for next node*/
-            temp = (dataImgPtr) calloc(1,sizeof(dataImg));
+            if(dir == ASCIZ_DIR || i+1 < counter){
+                temp = (dataImgPtr) calloc(1,sizeof(dataImg));
 
-            if(temp)
-                curr->next = temp;
-            else
-                state = ERROR;
+                if(temp)
+                    curr->next = temp;
+                else
+                    state = ERROR;
+            }
         }
         if(numLst)
             free(numLst);
@@ -70,8 +71,8 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
             curr->address = *DC;
             (*DC)++;}
 
-        else
-            free(temp);
+        else{
+            free(temp);}
 
         if(dcBefore == DC_INITIAL)
             (*imgHead) = arrayHead;

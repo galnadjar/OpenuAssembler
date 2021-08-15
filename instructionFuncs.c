@@ -76,20 +76,21 @@ int getOpCode(char* instruction){
 }
 
 /*returns 1 if args were valid, and 0 if invalid args were found*/
-int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
+int checkInsArgs(char* lineInput,char* instruction,char** labelName,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
 
     int state = VALID,funct;
     int opcode = getOpCode(instruction);
 
     if(opcode < I_CMD_MIN_OPCODE){/*all R type instructs*/
         funct = getFunct(instruction,opcode);
-        state = handleRargs(lineInput,i,line,IC,opcode,funct,imgHead);}
+        state = handleRargs(lineInput,i,line,IC,opcode,funct,imgHead);
+    }
 
     else if(opcode > I_CMD_MAX_OPCODE) /*all J type instructs*/
-        state = handleJargs(lineInput, i, line,IC,opcode,imgHead,labelTableHead);
+        state = handleJargs(lineInput,labelName,i, line,IC,opcode,imgHead,labelTableHead);
 
     else /*all I type instructs*/
-        state = handleIargs(lineInput, i, line,IC,opcode,imgHead,labelTableHead);
+        state = handleIargs(lineInput,labelName,i, line,IC,opcode,imgHead,labelTableHead);
 
     return state;
 }
@@ -149,19 +150,18 @@ int handleRargs(char* lineInput, int i, int line,long* IC,int opcode,int funct,c
 
 
 /*returns 1 if no errors were found , otherwise returns 0*/
-int handleJargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
+int handleJargs(char* lineInput,char** label,int i, int line, long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
 
     int state = VALID;
-    int reg;
+    int reg = 0;
     long address = 0;
-    char* label = NULL;
-    state = setJcmdReg(lineInput,i,line,&reg,&address,opcode,&label);
+    state = setJcmdReg(lineInput,i,line,&reg,&address,opcode,label);
 
     if(state != ERROR){
-        if(label)
-            addToLabelTable(labelTableHead,label,*IC,J_BRANCHING,line);
+        if(!reg) /*theres a usage with a label*/
+            addToLabelTable(labelTableHead,*label,*IC,J_BRANCHING,line);
 
-        state = addJCodeNode(reg,*IC,address,opcode,imgHead,label,line);
+        state = addJCodeNode(reg,*IC,address,opcode,imgHead,*label,line);
         if(!state)
             ERROR_MEMORY_MAXED_OUT(line);}
     else
@@ -171,28 +171,21 @@ int handleJargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr*
 }
 
 /*returns 1 if no errors were found , otherwise returns 0*/
-int handleIargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
+int handleIargs(char* lineInput,char** labelName, int i, int line, long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
 
     int rs,rt,state = VALID;
     long immed;
-    char* label;
 
     if(opcode == bne || opcode == beq || opcode == bgt || opcode == blt){
-        label = calloc(MAX_LABEL_LENGTH+1,sizeof(char));
-        if(label){
-            state = setIcmdWithLabel(lineInput,i,line,&rs,&rt,label);
-            addToLabelTable(labelTableHead,label,*IC,I_BRANCHING,line);
-        }
-        else{
-            state = ERROR;
-            ERROR_MEMORY_MAXED_OUT(line);}
+            state = setIcmdWithLabel(lineInput,i,line,&rs,&rt,labelName);
+            addToLabelTable(labelTableHead,*labelName,*IC,I_BRANCHING,line);
     }
 
     else
         state = setIcmdWithoutLabel(lineInput,i,line,&rs,&immed,&rt);
 
     if(state != ERROR){
-        state = addICodeNode(rs,rt,immed,*IC,opcode,imgHead,label,line);
+        state = addICodeNode(rs,rt,immed,*IC,opcode,imgHead,*labelName,line);
         if(!state)
             ERROR_MEMORY_MAXED_OUT(line);}
     else
@@ -203,7 +196,7 @@ int handleIargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr*
 
 
 /*handles cmd with labels,returns 1 if the properties was set properly because of valid input,otherwise returns -1*/
-int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char* label) {
+int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char** label) {
 
     int state = VALID;
 
@@ -215,7 +208,7 @@ int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char* label)
             if (i != ERROR) {
                 i = commaAfterSpace(lineInput, i);
                 if (i > 0) {
-                    i = analyzeLabel(lineInput,i,line,&label);
+                    i = analyzeLabel(lineInput,i,line,label);
                     if (i) {
                         i = locAfterSpace(lineInput, i);
                         if (i != strlen(lineInput) - 1){
@@ -244,12 +237,13 @@ int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char* label)
 int setIcmdWithoutLabel(char* lineInput,int i,int line,int* rs,long* immed,int* rt) {
 
     int state = VALID;
+    int comma = 0;
 
     i = checkAndSetReg(lineInput, i, line, rs, 1);
     if (i != ERROR) {
         i = commaAfterSpace(lineInput, i);
         if (i > 0) {
-            i = checkAndSetNum(lineInput, i, line, immed, 1,MIN_TWO_BYTES_SIZE,MAX_TWO_BYTES_SIZE);
+            i = checkAndSetNum(lineInput, i, line, immed, 1,MIN_TWO_BYTES_SIZE,MAX_TWO_BYTES_SIZE,&comma);
             if (i != ERROR) {
                 state = checkTwoByteSize(*immed);
                 if(state > 0){
@@ -345,22 +339,17 @@ int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,
         }
     }
 
-    else if(opcode == stop) {
+    else if(opcode == stop)
         state = analStop(lineInput, i, line);
-        if (state)
-            (*reg) = 0;
-    }
+
 
     else{ /*case its la or call*/
-        (*label) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
         i = analyzeLabel(lineInput,i,line,label);
         if(i != ERROR){
             i = locAfterSpace(lineInput,i);
             if(i != strlen(lineInput)-1){
                 ERROR_EXTRANEOUS_END_OF_CMD(line);
                 state = ERROR;}
-            else
-                (*reg) = 0;
         }
     }
     return state;
@@ -468,6 +457,8 @@ int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq){
             state = ERROR;
         }
     }
+    if(i == strlen(lineInput)-1 && digit)
+        state = handleRegSpace(digit,reg,regNum,line);
 
     if(state == ERROR)
         i = ERROR;

@@ -21,7 +21,7 @@ void readFile(FILE*,char* fileName);
 void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* category);
 void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF);
 int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead);
-int analyzeEntrySymbol(labelTablePtr labelPtr,entryTablePtr* entryHead);
+int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address);
 void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTablehead,
                     codeImgPtr* codeImgHead,dataImgPtr* dataImgHead, long DCF, long ICF,char* fp);
 

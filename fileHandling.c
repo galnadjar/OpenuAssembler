@@ -100,7 +100,9 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
     labelTablePtr curr = (*labelTablehead);
     for(;curr;curr = getNextLabelNode(curr)){/*iter through label as arg dataStructure*/
         ans = analyzeTypeSymbol(curr, symbolTableHead, externTableHead, codeHead,entryHead);
-
+        if(ans == EXIT)
+            if(findEntryLabel(entryHead, getLabelTableName(curr)))
+                analyzeEntrySymbol(getLabelTableName(curr),entryHead, getLabelTableAddress(curr));
         if(ans == ERROR)
             state = ERROR;
     }
@@ -108,22 +110,18 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
     return state;
 }
 
-/*returns 1 if entry was used,otherwise -1*/
-int analyzeEntrySymbol(labelTablePtr labelPtr,entryTablePtr* entryHead){
+/*update entry symbol address if found and then returns 1 if ,otherwise returns -1*/
+int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address){
 
     int state = ERROR; /*meaning entry wasn't found yet*/
 
     entryTablePtr entryPtr = (*entryHead);
     for(;entryPtr;entryPtr = getNextEntNode(entryPtr)){ /*iterating through the entry table*/
-        if(!strcmp(getEntryLabel(entryPtr), getLabelTableName(labelPtr))){
+        if(!strcmp(getEntryLabel(entryPtr), label)){
             state = VALID;
-            setEntryAddress(&entryPtr,getLabelTableAddress(labelPtr));
+            setEntryAddress(&entryPtr,address);
         }
     }
-
-    if(state == ERROR)
-        ERROR_LABEL_EXISTENCE(getLabelTableLine(labelPtr),getLabelTableName(labelPtr));
-
     return state;
 }
 
@@ -155,7 +153,7 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
             else{ /*not external*/
 
                 if(findEntryLabel(entryHead, getSymbolLabel(symPtr)))
-                    analyzeEntrySymbol(labelPtr,entryHead);
+                    analyzeEntrySymbol(getLabelTableName(labelPtr),entryHead, getSymbolAddress(symPtr));
 
                 if(getLabelBranch(labelPtr) == J_BRANCHING)
                     state = updateJbranching(codeHead,getLabelTableName(labelPtr), getSymbolAddress(symPtr));
@@ -263,15 +261,17 @@ void readFile(FILE* fp,char* fileName) {
                     }
 
                     else if (category == DIRECTIVE_FLAG) {
-                        state = checkDirArgs(lineInput, wordSaved, i, line,&DC,&dataImgHead);
-                        if(state && wasLabel)
-                            addSymbol(&symbolTableHead, labelName, DC, DATA_AT, line);}
+                        if(wasLabel)
+                            state = addSymbol(&symbolTableHead, labelName, DC, DATA_AT, line);
+                        if(state)
+                            state = checkDirArgs(lineInput, wordSaved, i, line,&DC,&dataImgHead);}
 
 
                     else { /*category == INSTRUCTION_FLAG*/
-                        state = checkInsArgs(lineInput, wordSaved, i, line, &IC, &codeImgHead,&labelTableHead);
-                        if (state && wasLabel)
+                        if(wasLabel)
                             state = addSymbol(&symbolTableHead, labelName, IC, CODE_AT, line);
+                        if (state)
+                            state = checkInsArgs(lineInput, wordSaved,&labelName, i, line, &IC, &codeImgHead,&labelTableHead);
                         if(state != ERROR)
                             IC += 4;
                     }
@@ -328,7 +328,7 @@ void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,con
     if(fp){
         printCounters(fp,ICF,DCF);
         printCodeImg(fp,codePtr);
-//        printDataImg(fp,dataPtr,ICF);/*todo undo this*/
+        printDataImg(fp,dataPtr,ICF);/*todo undo this*/
     }
 }
 

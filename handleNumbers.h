@@ -34,7 +34,7 @@ typedef enum{
 int handleNum(long* num, int ch, int line, int* firstDigit, long minVal, long maxVal);
 
 /*the function returns the index after the comma/space if the number was set properly,otherwise returns -1*/
-int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq, long minVal, long maxVal);
+int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq, long minVal, long maxVal,int* comma);
 int checkTwoByteSize(long num);
 
 /*check if the number will stay in the num range, returns 1 if so,otherwise returns 0*/

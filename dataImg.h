@@ -13,7 +13,7 @@
 typedef struct dataImg* dataImgPtr;
 void printDataImg(FILE* fp,dataImgPtr dataPtr,long ICF);
 void fillImgData(int dir,dataImgPtr* curr,const char* word,const long* numLst,int i,long* DC);
-int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC,int line);
+int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC,int line,int count);
 long getDirType(dataImgPtr);
 void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC);
 

@@ -70,7 +70,7 @@ entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word){
     entryTablePtr node = NULL;
     entryTablePtr curr = *entryTableHead;
 
-    for(;curr->next;curr = curr->next){
+    for(;curr;curr = curr->next){
         if(!strcmp(curr->label, word))
             node = curr;
     }
