@@ -78,7 +78,7 @@ entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word){
 
 }
 /*used to hold the ext file we going to print, returns 1 if no error,and -1 if memory allocation error found*/
-int addToExtTable(externTablePtr * tableHead, char* word, long address){
+int addToExtTable(externTablePtr *tableHead, char* word, long address,int line){
     externTablePtr node;
     externTablePtr curr = *tableHead;
     int state = VALID;
@@ -87,9 +87,10 @@ int addToExtTable(externTablePtr * tableHead, char* word, long address){
     if(node){
         strcpy(node->label,word);
         node->address = address;
+        node->line = line;
 
         if(!(curr->line))
-            tableHead = &node;
+            (*tableHead) = node;
 
         else{
             for(;curr->next;curr = curr->next);

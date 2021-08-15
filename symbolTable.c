@@ -107,6 +107,10 @@ int getSymbolSize(){
     return sizeof(symbol);
 }
 
+void updateSymbolAddress(symbolPtr* ptr,long num){
+    (*ptr)->address = getSymbolAddress(*ptr) + num;
+}
+
 
 
 

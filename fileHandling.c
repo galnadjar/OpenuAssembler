@@ -32,15 +32,15 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
     int state = VALID;
     externTablePtr externTableHead = (externTablePtr) calloc(1,getExternSize());
 
-    addICF(dataImgHead,ICF); /*adds the ICF value to the current data addresses*/
+    addICF(dataImgHead,symbolTableHead,ICF); /*adds the ICF value to the current data addresses*/
     state = analyzeLabelTable(labelTablehead, symbolTableHead,&externTableHead,codeImgHead,entryTableHead);
     if(state != ERROR){
 
         writeOB(name, *dataImgHead,*codeImgHead,DCF,ICF);
-        if(!getEntryLine(*entryTableHead)) /*check if head is empty*/
+        if(getEntryLine(*entryTableHead)) /*check if head is empty*/
             writeEntry(name,*entryTableHead);
 
-        if(!getExternLine(externTableHead))/*check if head is empty*/
+        if(getExternLine(externTableHead))/*check if head is empty*/
             writeExtern(name,externTableHead);
     }
 } /*end of readFile*/
@@ -99,9 +99,7 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
 
     labelTablePtr curr = (*labelTablehead);
     for(;curr;curr = getNextLabelNode(curr)){/*iter through label as arg dataStructure*/
-        ans = analyzeTypeSymbol(curr, symbolTableHead, externTableHead, codeHead);
-        if(!ans)/*label wasn't found in symboltable*/
-            ans = analyzeEntrySymbol(curr,entryHead);
+        ans = analyzeTypeSymbol(curr, symbolTableHead, externTableHead, codeHead,entryHead);
 
         if(ans == ERROR)
             state = ERROR;
@@ -131,7 +129,7 @@ int analyzeEntrySymbol(labelTablePtr labelPtr,entryTablePtr* entryHead){
 
 /*todo add a line number to every struct in the program so the messages would correspond to the line */
 /*returns 1 if the label exists and corresponds to the rules,if not in symbol table at all returns 0, otherwise -1*/
-int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead){
+int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead){
 
     int state = VALID,found = 0;
     symbolPtr symPtr = (*symbolHead);
@@ -142,7 +140,8 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
             found = 1;
             if(getSymbolType(symPtr) == EXTERN_AT){
                 if(getLabelBranch(labelPtr) == J_BRANCHING){ /*la/call/jmp*/
-                    state = addToExtTable(externHead, getLabelTableName(labelPtr), getLabelTableAddress(labelPtr));
+                    state = addToExtTable(externHead, getLabelTableName(labelPtr), getLabelTableAddress(labelPtr),
+                                          getLabelTableLine(labelPtr));
                     if(state == ERROR)
                         ERROR_MEMORY_MAXED_OUT(getLabelTableLine(labelPtr));
                 }
@@ -154,6 +153,10 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
             }
 
             else{ /*not external*/
+
+                if(findEntryLabel(entryHead, getSymbolLabel(symPtr)))
+                    analyzeEntrySymbol(labelPtr,entryHead);
+
                 if(getLabelBranch(labelPtr) == J_BRANCHING)
                     state = updateJbranching(codeHead,getLabelTableName(labelPtr), getSymbolAddress(symPtr));
 
@@ -173,12 +176,17 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
 
 
 /*adds ICF to all data addresses*/
-void addICF(dataImgPtr* dataImgHead,long ICF){
+void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF){
 
-    dataImgPtr curr = (*dataImgHead);
-    while(curr){
-        setDataAddress(&curr, getDataAddress(curr) + ICF);
-        curr = getNextDataNode(curr);
+    symbolPtr  currSymbol = (*symbolHead);
+    dataImgPtr currData = (*dataImgHead);
+    while(currData){
+        setDataAddress(&currData, getDataAddress(currData) + ICF);
+        currData = getNextDataNode(currData);
+    }
+    while(currSymbol){
+        if(getSymbolType(currSymbol) == DATA_AT)
+            updateSymbolAddress(&currSymbol,ICF);
     }
 }
 

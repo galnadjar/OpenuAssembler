@@ -20,7 +20,7 @@ int handleEntNode(char* label,entryTablePtr* entryHead,int line);
 entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word);
 int addEntry(entryTablePtr* entryHead,char* label,int line);
 
-int addToExtTable(externTablePtr * tableHead, char* word, long address);
+int addToExtTable(externTablePtr * tableHead, char* word, long address,int line);
 int getEntryLine(entryTablePtr ptr);
 
 char* getEntryLabel(entryTablePtr ptr);
