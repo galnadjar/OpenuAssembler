@@ -4,7 +4,6 @@
 typedef struct codeImg{
 
     long nodeAddress;
-    int opcode; /*an op code used to help understand which kind of node is held*/
     char label[MAX_LABEL_LENGTH+1];
     int line;
     codeImgPtr next;
@@ -63,7 +62,6 @@ int addRCodeNode(int rs,int rt,int rd,long IC,int opcode,int funct, codeImgPtr* 
         codeImgPtr curr = *imgHead;
 
         temp->nodeAddress = IC;
-        temp->opcode = opcode;
         temp->line = line;
 
 
@@ -94,7 +92,6 @@ int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,cha
 
     if(temp) {
         codeImgPtr curr = *imgHead;
-        temp->opcode = opcode;
         temp->nodeAddress = IC;
         temp->line = line;
         temp->codeData.Jcmd.address = address;
@@ -128,7 +125,6 @@ int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead
         codeImgPtr curr = *imgHead;
 
         temp->nodeAddress = IC;
-        temp->opcode = opcode;
         temp->line = line;
         temp->codeData.Icmd.opcode = opcode;
         temp->codeData.Icmd.rs = rs;
