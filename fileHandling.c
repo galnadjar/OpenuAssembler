@@ -1,6 +1,8 @@
 #include "fileHandling.h"
 
-/*opens the file and if not empty and valid, reads it as well*/
+/*opens the file ,and check if empty
+ * if the file was opened properly and is not empty, calls readFile function to read it*/
+
 void openFile(char* p){
 
     int state = 1;
@@ -26,6 +28,9 @@ void openFile(char* p){
 }
 
 
+/*after validating the input from the first iteration on the file,
+ * this function responsible for the second iteration, including more validating.
+ * if the given assembly file was validated in the second iteration as well, prints it in the required format*/
 void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTablehead,
                     codeImgPtr* codeImgHead,dataImgPtr* dataImgHead,const long DCF,const long ICF,char* name){
 
@@ -45,34 +50,34 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
     }
 } /*end of readFile*/
 
-
+/*this function creates a file for the entry data structure,
+ * if the memory is available for the name of the file and the file itself to be created, prints it*/
 void writeEntry(char* name,entryTablePtr entryPtr){
 
     FILE* fp;
-    char *externLabel = NULL,*extension;
-    externLabel = getEntryLabel(entryPtr);
-    if(externLabel){
-        extension = ".ent";
-        fp = createWriteFile(name, extension);
-        if(fp)
-            printEnt(fp,entryPtr);
-    }
+    char *extension;
+    extension = ".ent";
+    fp = createWriteFile(name, extension);
+    if(fp)
+        printEnt(fp,entryPtr);
+
 }
 
 
+/*this function creates a file for the extern data structure,
+ * if the memory is available for the name of the file and the file itself to be created, prints it*/
 void writeExtern(char* name, externTablePtr externPtr){
 
     FILE* fp;
-    char *externLabel = NULL,*extension;
-    externLabel = getExternLabel(externPtr);
-    if(externLabel){
-        extension = ".ext";
-        fp = createWriteFile(name, extension);
+    char *extension;
+    extension = ".ext";
+    fp = createWriteFile(name, extension);
         if(fp)
             printExt(fp,externPtr);
-    }
+
 }
 
+/*this function prints the extern data structure to the given file*/
 void printExt(FILE* fp,externTablePtr externPtr){
 
     externTablePtr curr = externPtr;
@@ -82,6 +87,7 @@ void printExt(FILE* fp,externTablePtr externPtr){
     }
 }
 
+/*this function prints the entry data structure to the given file*/
 void printEnt(FILE* fp,entryTablePtr entryPtr){
 
     entryTablePtr curr = entryPtr;
@@ -92,7 +98,11 @@ void printEnt(FILE* fp,entryTablePtr entryPtr){
 }
 
 
-/*if the external and entry were exist update them and return 1,otherwise -1*/
+/*if the external and entry were exist update them and return 1,otherwise -1
+ * the function analyzes each label that was passed as an argument and calls analyzeTypeSymbol to:
+ * validate and update the data structures based on their traits that were given from first iteration
+ * returns 1 everything was updated and found successfully
+ * returns -1 if a label wasn't declared or doesn't correspond to the rules*/
 int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,externTablePtr* externTableHead,codeImgPtr* codeHead,entryTablePtr* entryHead){
 
     int state = VALID,ans;
@@ -110,7 +120,7 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
     return state;
 }
 
-/*update entry symbol address if found and then returns 1 if ,otherwise returns -1*/
+/*updates an entry symbol address if found and then returns 1 ,otherwise if not found returns -1*/
 int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address){
 
     int state = ERROR; /*meaning entry wasn't found yet*/
@@ -125,8 +135,11 @@ int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address){
     return state;
 }
 
-/*todo add a line number to every struct in the program so the messages would correspond to the line */
-/*returns 1 if the label exists and corresponds to the rules,if not in symbol table at all returns 0, otherwise -1*/
+
+/*the function analyzes a given label from labelTable data structure
+ * returns 1 if the label exists in the symbolTable and corresponds to the rules.
+ * if exists but does not correspond to the rules returns -1.
+ * otherwise, if doesn't exist returns 0*/
 int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead){
 
     int state = VALID,found = 0;
@@ -173,7 +186,7 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
 }
 
 
-/*adds ICF to all data addresses*/
+/*adds ICF value to all data addresses*/
 void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF){
 
     symbolPtr  currSymbol = (*symbolHead);
@@ -189,24 +202,14 @@ void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF){
     }
 }
 
-void allocVars(char** labelName,char** wordSaved){
-
-    (*labelName) =  (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
-    (*wordSaved) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
-}
-
 /*this function reads the file and analyzes it for first iteration,if no error was found during read,
  * calls the second iteration function,otherwise closes file*/
-
 void readFile(FILE* fp,char* fileName) {
 
-    int i,line = 1, state = VALID,wasError = 0,wasLabel = 0;
-    int category = EMPTY_CATEGORY_FLAG;
+    int i,line = 1, state = VALID,wasError = 0,wasLabel = 0,category = EMPTY_CATEGORY_FLAG;
     long IC = IC_INITIAL_ADDRESS, DC = DC_INITIAL_ADDRESS;
-    char *lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
-    char *wordSaved = NULL,*labelName = NULL;
+    char *wordSaved = NULL,*labelName = NULL,*lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
 
-    /*todo check about the allocation of those dataStructers*/
     symbolPtr symbolTableHead = NULL;
     entryTablePtr entryTableHead = (entryTablePtr) calloc(1,sizeof(getExternSize()));
     codeImgPtr codeImgHead = NULL;
@@ -223,7 +226,8 @@ void readFile(FILE* fp,char* fileName) {
 
         if (state) {/*meaning its not comment and neither empty line*/
 
-            allocVars(&labelName,&wordSaved);
+            labelName =  (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
+            wordSaved = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
             i = parseCategory(&i, lineInput, &wordSaved, &category, line);/*parses the category of the first word*/
 
             if(i){
@@ -295,6 +299,7 @@ void readFile(FILE* fp,char* fileName) {
     fclose(fp);
 } /*end of readfile*/
 
+/*resets the iteration variables so they will be empty for the next iteration*/
 void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* category){
     (*i) = 0;
     (*wasLabel) = 0;
@@ -306,6 +311,7 @@ void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, in
         free(*wordSaved);
 }
 
+/*creates and return a valid file pointer if memory allow this allocation,otherwise returns null*/
 FILE* createWriteFile(char* name,char* extension){
     FILE* fp = NULL;
     char* fileName = NULL;

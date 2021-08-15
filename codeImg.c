@@ -191,14 +191,14 @@ int updateJbranching(codeImgPtr* codeHead,char* label, long address){
 
     for(;curr && state == VALID;curr = curr->next){
         if(!strcmp(curr->label,label)){
-            if(address <= MAX_JUMP_LENGTH)
+            if(address <= MAX_JUMP_LENGTH){
                 curr->codeData.Jcmd.address = address;
+                state = EXIT;}
+
             else{
                 state = ERROR;
                 ERROR_JUMP_OUT_OF_BOUNDS(curr->line);
             }
-
-            state = EXIT;
         }
     }
 
