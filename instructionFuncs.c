@@ -76,7 +76,7 @@ int getOpCode(char* instruction){
 }
 
 /*returns 1 if args were valid, and 0 if invalid args were found*/
-int checkInsArgs(char* lineInput,char* instruction,char** labelName,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
+int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
 
     int state = VALID,funct;
     int opcode = getOpCode(instruction);
@@ -87,10 +87,10 @@ int checkInsArgs(char* lineInput,char* instruction,char** labelName,int i,int li
     }
 
     else if(opcode > I_CMD_MAX_OPCODE) /*all J type instructs*/
-        state = handleJargs(lineInput,labelName,i, line,IC,opcode,imgHead,labelTableHead);
+        state = handleJargs(lineInput,i, line,IC,opcode,imgHead,labelTableHead);
 
     else /*all I type instructs*/
-        state = handleIargs(lineInput,labelName,i, line,IC,opcode,imgHead,labelTableHead);
+        state = handleIargs(lineInput,i, line,IC,opcode,imgHead,labelTableHead);
 
     return state;
 }
@@ -150,18 +150,19 @@ int handleRargs(char* lineInput, int i, int line,long* IC,int opcode,int funct,c
 
 
 /*returns 1 if no errors were found , otherwise returns 0*/
-int handleJargs(char* lineInput,char** label,int i, int line, long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
+int handleJargs(char* lineInput,int i, int line, long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
 
     int state = VALID;
     int reg = 0;
     long address = 0;
-    state = setJcmdReg(lineInput,i,line,&reg,&address,opcode,label);
+    char* label;
+    state = setJcmdReg(lineInput,i,line,&reg,&address,opcode,&label);
 
     if(state != ERROR){
         if(!reg) /*theres a usage with a label*/
-            addToLabelTable(labelTableHead,*label,*IC,J_BRANCHING,line);
+            addToLabelTable(labelTableHead,label,*IC,J_BRANCHING,line);
 
-        state = addJCodeNode(reg,*IC,address,opcode,imgHead,*label,line);
+        state = addJCodeNode(reg,*IC,address,opcode,imgHead,label,line);
         if(!state)
             ERROR_MEMORY_MAXED_OUT(line);}
     else
@@ -171,21 +172,22 @@ int handleJargs(char* lineInput,char** label,int i, int line, long* IC,int opcod
 }
 
 /*returns 1 if no errors were found , otherwise returns 0*/
-int handleIargs(char* lineInput,char** labelName, int i, int line, long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
+int handleIargs(char* lineInput, int i, int line, long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
 
     int rs,rt,state = VALID;
     long immed;
+    char* label;
 
     if(opcode == bne || opcode == beq || opcode == bgt || opcode == blt){
-            state = setIcmdWithLabel(lineInput,i,line,&rs,&rt,labelName);
-            addToLabelTable(labelTableHead,*labelName,*IC,I_BRANCHING,line);
+            state = setIcmdWithLabel(lineInput, i, line, &rs, &rt, &label);
+            addToLabelTable(labelTableHead, label, *IC, I_BRANCHING, line);
     }
 
     else
         state = setIcmdWithoutLabel(lineInput,i,line,&rs,&immed,&rt);
 
     if(state != ERROR){
-        state = addICodeNode(rs,rt,immed,*IC,opcode,imgHead,*labelName,line);
+        state = addICodeNode(rs, rt, immed, *IC, opcode, imgHead, label, line);
         if(!state)
             ERROR_MEMORY_MAXED_OUT(line);}
     else
@@ -197,7 +199,7 @@ int handleIargs(char* lineInput,char** labelName, int i, int line, long* IC,int 
 
 /*handles cmd with labels,returns 1 if the properties was set properly because of valid input,otherwise returns -1*/
 int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char** label) {
-
+    (*label) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
     int state = VALID;
 
     i = checkAndSetReg(lineInput, i, line, rs, 1);
@@ -344,6 +346,7 @@ int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,
 
 
     else{ /*case its la or call*/
+        (*label) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
         i = analyzeLabel(lineInput,i,line,label);
         if(i != ERROR){
             i = locAfterSpace(lineInput,i);

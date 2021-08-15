@@ -195,6 +195,9 @@ void allocVars(char** labelName,char** wordSaved){
     (*wordSaved) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
 }
 
+/*this function reads the file and analyzes it for first iteration,if no error was found during read,
+ * calls the second iteration function,otherwise closes file*/
+
 void readFile(FILE* fp,char* fileName) {
 
     int i,line = 1, state = VALID,wasError = 0,wasLabel = 0;
@@ -271,7 +274,7 @@ void readFile(FILE* fp,char* fileName) {
                         if(wasLabel)
                             state = addSymbol(&symbolTableHead, labelName, IC, CODE_AT, line);
                         if (state)
-                            state = checkInsArgs(lineInput, wordSaved,&labelName, i, line, &IC, &codeImgHead,&labelTableHead);
+                            state = checkInsArgs(lineInput, wordSaved, i, line, &IC, &codeImgHead,&labelTableHead);
                         if(state != ERROR)
                             IC += 4;
                     }
@@ -289,6 +292,7 @@ void readFile(FILE* fp,char* fileName) {
     if(!wasError) /*no reason for second iteration if errors were found at the first 1*/
         secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC + DC,IC,fileName);
 
+    fclose(fp);
 } /*end of readfile*/
 
 void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* category){
@@ -318,7 +322,7 @@ FILE* createWriteFile(char* name,char* extension){
         ERROR_MEMORY_ALLOCATION(name);
     return fp;
 }
-
+/*writes the ob file*/
 void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,const long ICF){
 
     FILE* fp = NULL;
@@ -328,11 +332,11 @@ void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,con
     if(fp){
         printCounters(fp,ICF,DCF);
         printCodeImg(fp,codePtr);
-        printDataImg(fp,dataPtr,ICF);/*todo undo this*/
+        printDataImg(fp,dataPtr,ICF);
     }
 }
 
-
+/*prints the data img to the file*/
 void printDataImg(FILE* fp, dataImgPtr dataPtr, long ICF){
 
     dataImgPtr curr = dataPtr;
@@ -344,6 +348,7 @@ void printDataImg(FILE* fp, dataImgPtr dataPtr, long ICF){
         curr = getNextDataNode(curr);}
 }
 
+/*prints the code img to the file*/
 void printCodeImg(FILE* fp,codeImgPtr codePtr){
 
     while(codePtr){
@@ -353,6 +358,7 @@ void printCodeImg(FILE* fp,codeImgPtr codePtr){
     }
 }
 
+/*prints the IC AND DC COUNTERS*/
 void printCounters(FILE* fp ,long IC, long DC){
         fprintf(fp,"\t\t%ld\t%ld\n",IC-IC_INITIAL_ADDRESS,DC-IC);
 }
