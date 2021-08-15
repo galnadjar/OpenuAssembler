@@ -171,9 +171,6 @@ dataImgPtr getNextDataNode(dataImgPtr ptr){
     return ptr->next;
 }
 
-long getDirType(dataImgPtr ptr){
-    return ptr->type;
-}
 void newLineOrTab(FILE* fp,const int bytesCounter,long* DC){
 
     if(bytesCounter % BYTES_LINE_LEN == 0){

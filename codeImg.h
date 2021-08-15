@@ -33,7 +33,6 @@ codeImgPtr getNextCodeNode(codeImgPtr ptr);
 
 #define MIN_REG_NUM 0
 #define MAX_REG_NUM 31
-#define STOP_OPCODE 63
 #define I_BRANCHING_MIN_OPCODE 15
 #define I_BRANCHING_MAX_OPCODE 18
 #define J_CMDS_WITH_LABEL_MIN_OPCODE 30

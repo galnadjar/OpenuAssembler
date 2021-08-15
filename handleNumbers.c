@@ -67,7 +67,7 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
         state = handleNumSpace(&sum, operator, firstDigit, line);
         if(state == EXIT)
             (*num) = sum;
-            (*comma) = 0;}
+            (*comma) = 0;} /*todo check why yellow*/
 
     if(state == ERROR)
         i = ERROR;

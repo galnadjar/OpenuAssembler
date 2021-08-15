@@ -21,13 +21,10 @@ void addNodeToSymbolTable(symbolPtr* head, symbolPtr* desired);
 symbolPtr findSymbolLabel(symbolPtr* symbolTableHead, char* word);
 int createSymbol(symbolPtr* symbolHead,char* label,long address,int category,int line);
 void updateSymbolAddress(symbolPtr* ptr,long num);
-//void copySymbolValues(symbolPtr* dest,symbolPtr source);
-int getSymbolSize();
 
 char* getSymbolLabel(symbolPtr ptr);
 long getSymbolAddress(symbolPtr ptr);
 int getSymbolType(symbolPtr ptr);
-int getSymbolLine(symbolPtr ptr);
 symbolPtr getSymbolNextNode(symbolPtr ptr);
 
 void setSymbolValues(symbolPtr* ptr,char* label,long address,int category,int line);

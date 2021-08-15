@@ -9,11 +9,9 @@
 #include <stdio.h>
 #include "errorsHeader.h"
 
-#define UNKNOWN_ADDRESS (-1)
 
 typedef struct entryTable* entryTablePtr;
 typedef struct externTable* externTablePtr;
-
 
 
 int handleEntNode(char* label,entryTablePtr* entryHead,int line);

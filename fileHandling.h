@@ -36,5 +36,4 @@ void printEnt(FILE* fp,entryTablePtr entryPtr);
 int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,externTablePtr* externTableHead,codeImgPtr* codeHead,entryTablePtr* entryHead);
 void printCodeImg(FILE* fp,codeImgPtr codePtr);
 void printCounters(FILE* fp ,long IC, long DC);
-void printDataNode(FILE* fp, dataImgPtr dataPtr);
 #endif //MAMAN14_FILEHANDLING_H

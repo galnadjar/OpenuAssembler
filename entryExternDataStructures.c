@@ -77,6 +77,7 @@ entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word){
     return node;
 
 }
+
 /*used to hold the ext file we going to print, returns 1 if no error,and -1 if memory allocation error found*/
 int addToExtTable(externTablePtr *tableHead, char* word, long address,int line){
     externTablePtr node;
@@ -115,6 +116,7 @@ char* getExternLabel(externTablePtr ptr){
 long getExternSize(){
     return sizeof(externTable);
 }
+
 long getExtAddress(externTablePtr ptr){
     return ptr->address;
 }

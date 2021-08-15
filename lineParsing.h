@@ -29,7 +29,6 @@ int handleLabelOrInstruction(int* category,char* word,int line);
 int validDirectiveName(char*);
 int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int line);
 int validDotStart(int ,int ,int );
-void categoryAnalyze(char* , int);
 void invalidCategoryArgs(int line, int category);
 void labelNameError(int line,char* word);
 void directiveCategorySelector(int* category,char* word);

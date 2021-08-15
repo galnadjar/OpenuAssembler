@@ -95,17 +95,11 @@ int getSymbolType(symbolPtr ptr){
     return ptr->type;
 }
 
-int getSymbolLine(symbolPtr ptr){
-    return ptr->line;
-}
 
 symbolPtr getSymbolNextNode(symbolPtr ptr){
     return ptr->next;
 }
 
-int getSymbolSize(){
-    return sizeof(symbol);
-}
 
 void updateSymbolAddress(symbolPtr* ptr,long num){
     (*ptr)->address = getSymbolAddress(*ptr) + num;
