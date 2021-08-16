@@ -48,7 +48,9 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
         if(getExternLine(externTableHead))/*check if head is empty*/
             writeExtern(name,externTableHead);
     }
+    releaseDataTables(symbolTableHead,entryTableHead,labelTablehead,codeImgHead,dataImgHead,&externTableHead); /*check why segmenation*/
 } /*end of readFile*/
+
 
 /*this function creates a file for the entry data structure,
  * if the memory is available for the name of the file and the file itself to be created, prints it*/
@@ -77,6 +79,7 @@ void writeExtern(char* name, externTablePtr externPtr){
 
 }
 
+
 /*this function prints the extern data structure to the given file*/
 void printExt(FILE* fp,externTablePtr externPtr){
 
@@ -86,6 +89,7 @@ void printExt(FILE* fp,externTablePtr externPtr){
         curr = getNextExtNode(curr);
     }
 }
+
 
 /*this function prints the entry data structure to the given file*/
 void printEnt(FILE* fp,entryTablePtr entryPtr){
@@ -119,6 +123,7 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
 
     return state;
 }
+
 
 /*updates an entry symbol address if found and then returns 1 ,otherwise if not found returns -1*/
 int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address){
@@ -202,6 +207,7 @@ void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF){
     }
 }
 
+
 /*this function reads the file and analyzes it for first iteration,if no error was found during read,
  * calls the second iteration function,otherwise closes file*/
 void readFile(FILE* fp,char* fileName) {
@@ -234,38 +240,14 @@ void readFile(FILE* fp,char* fileName) {
                 /*case label*/
                 if (category == LABEL_FLAG){
                     wasLabel = 1;
-                    if(isspace(lineInput[i])) { /*check that after the ':' theres a spacing*/
-                        strcpy(labelName,wordSaved);
-                        i = parseCategory(&i, lineInput, &wordSaved, &category, line);}
-
-                    else{
-                        i = 0;
-                        state = ERROR;
-                        ERROR_LABEL_WITHOUT_SPACE(line);}
-                }
+                    state = handleLabelCategory(&i,lineInput,&labelName,&wordSaved,&category,line);}
 
                 if (i) {
 
                     /* case extern / entry*/
-                    if (category == EXTERN_FLAG || category == ENTRY_FLAG) {
-                        i = analyzeLabel(lineInput,i,line,&labelName);
+                    if (category == EXTERN_FLAG || category == ENTRY_FLAG)
+                        state = handleEntOrExt(&i,lineInput,labelName,line,category,entryTableHead,symbolTableHead);
 
-                        if (i != ERROR) {
-                            i = locAfterSpace(lineInput, i);
-
-                            if (i == strlen(lineInput)-1) {
-                                if (category == ENTRY_FLAG)
-                                    state = addEntry(&entryTableHead, labelName, line);
-
-                                else
-                                    state = addSymbol(&symbolTableHead,labelName,0,EXTERN_AT,line);
-                            }
-
-                            else {
-                                ERROR_EXTRANEOUS_END_OF_CMD(line);
-                                state = ERROR;}
-                        }
-                    }
 
                     else if (category == DIRECTIVE_FLAG) {
                         if(wasLabel)
@@ -279,13 +261,11 @@ void readFile(FILE* fp,char* fileName) {
                             state = addSymbol(&symbolTableHead, labelName, IC, CODE_AT, line);
                         if (state)
                             state = checkInsArgs(lineInput, wordSaved, i, line, &IC, &codeImgHead,&labelTableHead);
-                        if(state != ERROR)
-                            IC += 4;
+                        IC += 4;
                     }
                 }
             }
         }
-
         resetIterVars(&wasLabel, &wordSaved, &labelName, &i, &category);
         line++;
         if(state == ERROR)
@@ -293,11 +273,54 @@ void readFile(FILE* fp,char* fileName) {
     }
     free(lineInput);
 
-    if(!wasError) /*no reason for second iteration if errors were found at the first 1*/
+    if(!wasError) /*no reason for second iteration if errors were found at the first iteration*/
         secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC + DC,IC,fileName);
 
     fclose(fp);
 } /*end of readfile*/
+
+
+/*this function handles the case when the category given is a label*/
+int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved,int* category,int line){
+
+    int state = VALID;
+
+    if(isspace(lineInput[(*i)])) { /*check that after the ':' theres a spacing*/
+        strcpy(*labelName,*wordSaved);
+        (*i) = parseCategory(i, lineInput, wordSaved, category, line);}
+
+    else{
+        (*i) = 0;
+        state = ERROR;
+        ERROR_LABEL_WITHOUT_SPACE(line);}
+    return state;
+}
+
+
+/*handle the case when the category given is entry/extern*/
+int handleEntOrExt(int* i,char* lineInput,char* labelName,int line,int category,entryTablePtr entryHead,symbolPtr symHead){
+
+    int state = VALID;
+    (*i) = analyzeLabel(lineInput,*i,line,&labelName);
+
+    if ((*i) != ERROR) {
+        (*i) = locAfterSpace(lineInput, *i);
+
+        if ((*i) == strlen(lineInput)-1) {
+            if (category == ENTRY_FLAG)
+                state = addEntry(&entryHead, labelName, line);
+
+            else
+                state = addSymbol(&symHead,labelName,0,EXTERN_AT,line);
+        }
+
+        else {
+            ERROR_EXTRANEOUS_END_OF_CMD(line);
+            state = ERROR;}
+    }
+    return state;
+}
+
 
 /*resets the iteration variables so they will be empty for the next iteration*/
 void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* category){
@@ -310,6 +333,7 @@ void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, in
     if(*wordSaved)
         free(*wordSaved);
 }
+
 
 /*creates and return a valid file pointer if memory allow this allocation,otherwise returns null*/
 FILE* createWriteFile(char* name,char* extension){
@@ -328,6 +352,8 @@ FILE* createWriteFile(char* name,char* extension){
         ERROR_MEMORY_ALLOCATION(name);
     return fp;
 }
+
+
 /*writes the ob file*/
 void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,const long ICF){
 
@@ -338,21 +364,23 @@ void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,con
     if(fp){
         printCounters(fp,ICF,DCF);
         printCodeImg(fp,codePtr);
-        printDataImg(fp,dataPtr,ICF);
+        printDataImg(fp,dataPtr,ICF,DCF);
     }
 }
 
+
 /*prints the data img to the file*/
-void printDataImg(FILE* fp, dataImgPtr dataPtr, long ICF){
+void printDataImg(FILE* fp, dataImgPtr dataPtr, long ICF,const long DCF){
 
     dataImgPtr curr = dataPtr;
     long DC = ICF;
     int bytesCounter = 0;
     fprintf(fp,"%04ld\t",DC);
     while(curr){
-        printDataDisplay(fp,curr,&bytesCounter,&DC);
+        printDataDisplay(fp,curr,&bytesCounter,&DC,DCF);
         curr = getNextDataNode(curr);}
 }
+
 
 /*prints the code img to the file*/
 void printCodeImg(FILE* fp,codeImgPtr codePtr){
@@ -364,7 +392,75 @@ void printCodeImg(FILE* fp,codeImgPtr codePtr){
     }
 }
 
+
 /*prints the IC AND DC COUNTERS*/
 void printCounters(FILE* fp ,long IC, long DC){
         fprintf(fp,"\t\t%ld\t%ld\n",IC-IC_INITIAL_ADDRESS,DC-IC);
+}
+
+/*releases all the data structures in the program*/
+void releaseDataTables(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTableHead,
+                  codeImgPtr* codeImgHead,dataImgPtr* dataImgHead,externTablePtr* externTableHead){
+
+    freeSymSt(symbolTableHead);
+    freeEntSt(entryTableHead);
+    freeExtSt(externTableHead);
+    freeLabelSt(labelTableHead);
+    freeCodeSt(codeImgHead);
+    freeDataSt(dataImgHead);
+
+}
+
+
+/*those function releases the specific table given from the memory*/
+void freeSymSt(symbolPtr* ptr){
+    symbolPtr currSym = (*ptr),tailSym;
+    while(currSym){
+        tailSym = currSym;
+        currSym = getSymbolNextNode(currSym);
+        free(tailSym);}
+}
+
+void freeEntSt(entryTablePtr* ptr){
+    entryTablePtr currEnt = (*ptr),tailEnt;
+    while(currEnt){
+        tailEnt = currEnt;
+        currEnt = getNextEntNode(currEnt);
+        free(tailEnt);}
+}
+
+void freeExtSt(externTablePtr* ptr){
+    externTablePtr currExt = (*ptr),tailExt;
+    while(currExt){
+        tailExt = currExt;
+        currExt = getNextExtNode(currExt);
+        free(tailExt);
+    }
+}
+
+void freeLabelSt(labelTablePtr* ptr){
+    labelTablePtr currLab = (*ptr),tailLab;
+    while(currLab){
+        tailLab = currLab;
+        currLab = getNextLabelNode(currLab);
+        free(tailLab);
+    }
+}
+
+void freeCodeSt(codeImgPtr* ptr){
+    codeImgPtr currCode = (*ptr),tailCode;
+    while(currCode){
+        tailCode = currCode;
+        currCode = getNextCodeNode(currCode);
+        free(tailCode);
+    }
+}
+
+void freeDataSt(dataImgPtr* ptr){
+    dataImgPtr currData = (*ptr),tailData;
+    while(currData){
+        tailData = currData;
+        currData = getNextDataNode(currData);
+        free(tailData);
+    }
 }

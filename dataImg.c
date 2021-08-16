@@ -71,9 +71,6 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
             curr->address = *DC;
             (*DC)++;}
 
-        else{
-            free(temp);}
-
         if(dcBefore == DC_INITIAL)
             (*imgHead) = arrayHead;
 
@@ -89,7 +86,8 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
     return state;
 }
 
-void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
+/*prints the data img to the file based on the type of each node given*/
+void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC,long const DCF){
 
     switch (ptr->type) {
 
@@ -98,18 +96,18 @@ void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
 
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter)++;
-            newLineOrTab(fp,*bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC,DCF);
 
             break;
 
         case DH_DIR:
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter) ++;
-            newLineOrTab(fp,*bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC,DCF);
 
             fprintf(fp,"%02X",(int)ptr->data.display.d2);
             (*bytesCounter) ++;
-            newLineOrTab(fp,*bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC,DCF);
 
             break;
 
@@ -117,23 +115,25 @@ void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC){
             fprintf(fp,"%02X",(int)ptr->data.display.d1);
             (*bytesCounter) ++;
 
-            newLineOrTab(fp,*bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC,DCF);
             fprintf(fp,"%02X",(int)ptr->data.display.d2);
             (*bytesCounter) ++;
 
-            newLineOrTab(fp,*bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC,DCF);
             fprintf(fp,"%02X",(int)ptr->data.display.d3);
             (*bytesCounter) ++;
 
-            newLineOrTab(fp,*bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC,DCF);
             fprintf(fp,"%02X",(int)ptr->data.display.d4);
             (*bytesCounter) ++;
-            newLineOrTab(fp,*bytesCounter,DC);
+            newLineOrTab(fp,*bytesCounter,DC,DCF);
 
             break;
     }
 }
 
+
+/*fills the data node, in the matching field according to the type of it and raises DC accordingly*/
 void fillImgData(int dir,dataImgPtr* curr,const char* word,const long* numLst,int i,long* DC){
     switch (dir) {
 
@@ -159,24 +159,33 @@ void fillImgData(int dir,dataImgPtr* curr,const char* word,const long* numLst,in
     }
 }
 
+/*a getter for a data address of the current data node*/
 long getDataAddress(dataImgPtr ptr){
     return ptr->address;
 }
 
+/*a setter for a data address of the current data node*/
 void setDataAddress(dataImgPtr* ptr,long address){
     (*ptr)->address = address;
 }
 
+/*a getter for the next data node*/
 dataImgPtr getNextDataNode(dataImgPtr ptr){
     return ptr->next;
 }
 
-void newLineOrTab(FILE* fp,const int bytesCounter,long* DC){
+/*a function which:
+ * prints new line if reached to 4 bytes in a row.
+ * if the new DC is lower than DCF also prints the new address.
+ * otherwise, prints a tab*/
+
+void newLineOrTab(FILE* fp,const int bytesCounter,long* DC,const long DCF){
 
     if(bytesCounter % BYTES_LINE_LEN == 0){
         fputc('\n',fp);
         (*DC) += BYTES_LINE_LEN;
-        fprintf(fp,"%04ld\t",*DC);}
+        if(*DC < DCF)
+            fprintf(fp,"%04ld\t",*DC);}
 
     else
         fputc('\t',fp);

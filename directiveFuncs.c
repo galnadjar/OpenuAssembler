@@ -3,6 +3,7 @@
 //
 
 #include "directiveFuncs.h"
+
 int getDir(char* directive){
 
     int dir;
@@ -21,6 +22,7 @@ int getDir(char* directive){
 
     return dir;
 }
+
 
 /* if not enough memory available or directive args were invalid return 0 otherwise return 1*/
 int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataImgPtr* ImgHead){
@@ -52,6 +54,7 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
     }
     return state;
 }
+
 
 /*analyze asciz string, if the analysis was valid return 1, otherwise returns 0*/
 int analAsciz(int i, char* lineInput, int line, char** word){
@@ -87,6 +90,7 @@ int analAsciz(int i, char* lineInput, int line, char** word){
 
     return state;
 }
+
 
 /*returns 1 if was valid operation, otherwise 0*/
 int analNumLst(int i, char* lineInput, int line, long** numLst, int dir,int* numberCnt){

@@ -3,6 +3,8 @@
 //
 
 #include "instructionFuncs.h"
+
+
 int getOpCode(char* instruction){
 
     opcode code;
@@ -95,6 +97,7 @@ int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeI
     return state;
 }
 
+
 int getFunct(char* instruction,int opcode){
 
     int funct;
@@ -129,6 +132,7 @@ int getFunct(char* instruction,int opcode){
     }
     return funct;
 }
+
 
 /*returns 1 if no errors were found , otherwise returns 0*/
 int handleRargs(char* lineInput, int i, int line,long* IC,int opcode,int funct,codeImgPtr* imgHead){
@@ -170,6 +174,7 @@ int handleJargs(char* lineInput,int i, int line, long* IC,int opcode,codeImgPtr*
 
     return state;
 }
+
 
 /*returns 1 if no errors were found , otherwise returns 0*/
 int handleIargs(char* lineInput, int i, int line, long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
@@ -235,6 +240,7 @@ int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char** label
     return state;
 }
 
+
 /*handles cmd without labels,returns 1 if the properties were set properly because of valid input,otherwise returns -1*/
 int setIcmdWithoutLabel(char* lineInput,int i,int line,int* rs,long* immed,int* rt) {
 
@@ -279,9 +285,13 @@ int setIcmdWithoutLabel(char* lineInput,int i,int line,int* rs,long* immed,int* 
     return state;
 }
 
+
+
 int regNumCheck(int reg){
     return reg >= MIN_REG_NUM && reg <= MAX_REG_NUM;
 }
+
+
 
 int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode){
 
@@ -359,6 +369,7 @@ int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,
 }
 
 
+
 int analStop(char* lineInput,int i,int line){
 
     int state = VALID;
@@ -369,6 +380,7 @@ int analStop(char* lineInput,int i,int line){
     }
     return state;
 }
+
 
 
 int analJmp(char* lineInput,int i,int line,int* reg,long* address,char** labelName) {
@@ -400,6 +412,7 @@ int analJmp(char* lineInput,int i,int line,int* reg,long* address,char** labelNa
     }
     return state;
 }
+
 
 /*check if the first letter given is directed to a register or labelname*/
 int checkFirstLetter(char* lineInput,int i){
@@ -487,8 +500,8 @@ int handleRegSpace(int digit,int* reg,int regNum,int line){
     return state;
 }
 
-/*handles the case of digit encounter in reg name*/
 
+/*handles the case of digit encounter in reg name*/
 int handleRegDigit(int regSign,int* digit,int* regNum,int ch,int line){
 
     int state = VALID;
@@ -508,6 +521,7 @@ int handleRegDigit(int regSign,int* digit,int* regNum,int ch,int line){
     }
     return state;
 }
+
 
 /*handles the case of comma in a reg name*/
 int handleRegComma(int* reg,int regNum,int line,int ch,int digit,int regSign, int commaReq){

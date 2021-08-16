@@ -20,6 +20,8 @@ void openFile(char*);
 void readFile(FILE*,char* fileName);
 void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* category);
 void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF);
+int handleEntOrExt(int* i,char* lineInput,char* labelName,int line,int category,entryTablePtr entryHead,symbolPtr symHead);
+int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved,int* category,int line);
 int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead);
 int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address);
 void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTablehead,
@@ -36,4 +38,19 @@ void printEnt(FILE* fp,entryTablePtr entryPtr);
 int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,externTablePtr* externTableHead,codeImgPtr* codeHead,entryTablePtr* entryHead);
 void printCodeImg(FILE* fp,codeImgPtr codePtr);
 void printCounters(FILE* fp ,long IC, long DC);
+
+void releaseDataTables(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTableHead,
+                       codeImgPtr* codeImgHead,dataImgPtr* dataImgHead,externTablePtr* externTableHead);
+
+void freeSymSt(symbolPtr* ptr);
+
+void freeEntSt(entryTablePtr* ptr);
+
+void freeExtSt(externTablePtr* ptr);
+
+void freeLabelSt(labelTablePtr* ptr);
+
+void freeCodeSt(codeImgPtr* ptr);
+
+void freeDataSt(dataImgPtr* ptr);
 #endif //MAMAN14_FILEHANDLING_H

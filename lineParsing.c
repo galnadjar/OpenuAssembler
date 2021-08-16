@@ -44,6 +44,8 @@ int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int 
     return *i;
 } /*end of parseFirstWord func*/
 
+
+
 int validDirectiveName(char* word){
 
     char dw[] = ".dw" ,db[] = ".db" ,dh[] = ".dh", asciz[] = ".asciz", ext[] = ".extern",ent[] = ".entry";
@@ -51,6 +53,7 @@ int validDirectiveName(char* word){
     return (!strcmp(word, dw) || !strcmp(word, db) || !strcmp(word, dh) ||
            !strcmp(word, asciz) || !strcmp(word, ext) || !strcmp(word, ent));
 }
+
 
 
 int validDotStart(int dot,int firstLetter,int line){
@@ -72,6 +75,8 @@ int validDotStart(int dot,int firstLetter,int line){
     return ans;
 }
 
+
+
 void invalidCategoryArgs(int line, int category){
 
     if((category) == DIRECTIVE_FLAG)
@@ -84,6 +89,8 @@ void invalidCategoryArgs(int line, int category){
         ERROR_LABEL_NAME(line);
 }
 
+
+
 void labelNameError(int line,char* word){
     if (strlen(word) > MAX_LABEL_LENGTH)/*the label length is too long*/
         ERROR_LABEL_LENGTH(line);
@@ -92,6 +99,9 @@ void labelNameError(int line,char* word){
         ERROR_LABEL_NAME(line);
 
 }
+
+
+
 void directiveCategorySelector(int* category,char* word){
 
     if(!strcmp(word,".entry"))
@@ -104,6 +114,7 @@ void directiveCategorySelector(int* category,char* word){
         (*category) = DIRECTIVE_FLAG;
     }
 }
+
 
 
 int handleColon(char* word,int* category,int firstLetter,int line ,int ch){
@@ -128,6 +139,7 @@ int handleColon(char* word,int* category,int firstLetter,int line ,int ch){
 
     return state;
 }
+
 
 
 int analyzeChar(int* dot,int ch,int* firstLetter,int line){
@@ -182,6 +194,8 @@ int handleDirCase(int* category, char* word, int line){
     }
     return state;
 }
+
+
 
 int handleLabelOrInstruction(int* category,char* word,int line){
     int ans,state = VALID;

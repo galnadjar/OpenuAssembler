@@ -61,6 +61,7 @@ int analyzeLabel(char* lineInput, int i, int line, char** label){
     return i;
 }
 
+
 /*returns 1 if not found in the database otherwise if found returns 0*/
 int validLabelORInstruction(char* input, int request) {/*returns 1 if not found in the list, and 0 if found*/
     int isFound = 0;
@@ -98,4 +99,3 @@ int validLabelORInstruction(char* input, int request) {/*returns 1 if not found 
     }
     return !isFound;
 }
-

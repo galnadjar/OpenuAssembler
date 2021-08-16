@@ -54,7 +54,7 @@ int handleEntNode(char* label,entryTablePtr* entryHead,int line){
         strcpy(tempEnt->label,label);
         tempEnt->line = line;
 
-        if(getEntryLine(*entryHead)){
+        if(getEntryLine(*entryHead)){ /*check if the head is not empty*/
             for(currEnt = (*entryHead);currEnt->next;currEnt = currEnt->next);
             currEnt->next = tempEnt;}
 
