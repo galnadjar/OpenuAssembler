@@ -339,32 +339,26 @@ int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,
 
     if(opcode != stop && locAfterSpace(lineInput,i) == strlen(lineInput)-1){/*empty instruction*/
         state = ERROR;
-        ERROR_EMPTY_INSTRUCTION(line);
-    }
+        ERROR_EMPTY_INSTRUCTION(line);}
 
-    else if(opcode == jmp){
+    else if(opcode == jmp)
         i = analJmp(lineInput,i,line,reg,address,label);
-        if(i != ERROR){
-            i = locAfterSpace(lineInput,i);
-            if(i != strlen(lineInput)-1)
-                ERROR_EXTRANEOUS_END_OF_CMD(line);
-        }
-    }
-
-    else if(opcode == stop)
-        state = analStop(lineInput, i, line);
 
 
-    else{ /*case its la or call*/
+    else if(opcode == la || opcode == call) {
         (*label) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
-        i = analyzeLabel(lineInput,i,line,label);
-        if(i != ERROR){
-            i = locAfterSpace(lineInput,i);
-            if(i != strlen(lineInput)-1){
-                ERROR_EXTRANEOUS_END_OF_CMD(line);
-                state = ERROR;}
-        }
+         i = analyzeLabel(lineInput,i,line,label);}
+
+
+    if(state != ERROR && i != ERROR){
+        i = locAfterSpace(lineInput,i);
+        if(i != strlen(lineInput)-1){
+            ERROR_EXTRANEOUS_END_OF_CMD(line);
+            state = ERROR;}
     }
+    if(i == ERROR)
+        state = ERROR;
+
     return state;
 }
 
@@ -385,32 +379,32 @@ int analStop(char* lineInput,int i,int line){
 
 int analJmp(char* lineInput,int i,int line,int* reg,long* address,char** labelName) {
 
-    int option, state = VALID;
+    int option;
     option = checkFirstLetter(lineInput, i); /*based on the first letter ,selects which arg will be received*/
 
     switch (option) {
 
         case REG_OPTION:
-            state = checkAndSetReg(lineInput,i,line,(int*)address,0);
-            if(state != ERROR)
+            i = checkAndSetReg(lineInput,i,line,(int*)address,0);
+            if(i != ERROR)
                 (*reg) = 1;
             break;
 
         case LABEL_OPTION:
             (*labelName) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
-            state = analyzeLabel(lineInput,i,line,labelName);
-            if(state != ERROR)
+            i = analyzeLabel(lineInput,i,line,labelName);
+            if(i != ERROR)
                 (*reg) = 0;
             break;
 
 
         default:/*first letter that was passed as an instruction arg was invalid*/
-            state = ERROR;
+            i = ERROR;
             ERROR_INVALID_CHAR(line, lineInput[locAfterSpace(lineInput, i)]);
             break;
 
     }
-    return state;
+    return i;
 }
 
 
@@ -465,15 +459,21 @@ int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq){
             if(!regSign)
                 regSign = 1;
 
-            else{ /*there was a reg sign already*/
+            else{ /*a reg sign was already given*/
                 ERROR_INVALID_REG_NAME(line);
-                state = ERROR;}}
-        else{
-            ERROR_INVALID_CHAR(line,ch);
-            state = ERROR;
+                state = ERROR;}
         }
+
+        else{ /*there was a reg sign already*/
+            if(regSign)
+                ERROR_INVALID_REG_NAME(line);
+            else
+                ERROR_INVALID_CHAR(line,ch);
+
+            state = ERROR;}
     }
-    if(i == strlen(lineInput)-1 && digit)
+
+    if(state != ERROR && i == strlen(lineInput)-1 && digit)
         state = handleRegSpace(digit,reg,regNum,line);
 
     if(state == ERROR)

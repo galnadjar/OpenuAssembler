@@ -46,7 +46,7 @@ int analyzeLabel(char* lineInput, int i, int line, char** label){
             state = ERROR;
         }
     }
-
+    /*todo check if thats really an option or needs to be -1*/
     if(i == strlen(lineInput)){
         ERROR_LABEL_NAME(line);
         state = ERROR;}

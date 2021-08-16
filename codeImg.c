@@ -138,7 +138,7 @@ int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead
 
 
         if(IC > 100){
-            for (; curr->next; curr = curr->next);
+            for (;curr->next; curr = curr->next);
             curr->next = temp;
         }
 

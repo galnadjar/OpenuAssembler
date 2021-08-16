@@ -23,7 +23,9 @@ void openFile(char* p){
     }
 
     if(state){
+        printf("----------------------------START OF FILE------------------------------\n");
         readFile(fp,p);
+        printf("----------------------------END OF FILE------------------------------\n");
     }
 }
 
@@ -49,7 +51,7 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
             writeExtern(name,externTableHead);
     }
     releaseDataTables(symbolTableHead,entryTableHead,labelTablehead,codeImgHead,dataImgHead,&externTableHead); /*check why segmenation*/
-} /*end of readFile*/
+}
 
 
 /*this function creates a file for the entry data structure,
@@ -242,13 +244,12 @@ void readFile(FILE* fp,char* fileName) {
                     wasLabel = 1;
                     state = handleLabelCategory(&i,lineInput,&labelName,&wordSaved,&category,line);}
 
-                if (i) {
+                if(i) {
 
                     /* case extern / entry*/
                     if (category == EXTERN_FLAG || category == ENTRY_FLAG)
                         state = handleEntOrExtCategory(&i, lineInput, labelName, line, category, &entryTableHead,
                                                        &symbolTableHead);
-
 
                     else if (category == DIRECTIVE_FLAG) {
                         if(wasLabel)
@@ -278,7 +279,7 @@ void readFile(FILE* fp,char* fileName) {
         secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC + DC,IC,fileName);
 
     fclose(fp);
-} /*end of readfile*/
+}
 
 
 /*this function handles the case when the category given is a label*/

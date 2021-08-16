@@ -69,15 +69,19 @@ int analAsciz(int i, char* lineInput, int line, char** word){
 
             if(ch == '"')
                 state = EXIT;
-            /*todo handle the asciz escape char*/
-//            else if(ch == '\')
+
             else
                 (*word)[wordInd++] = (char)ch;
             }
 
-        if(i == strlen(lineInput) -1 && state == VALID){ /*reached the end without finding quotation mark*/
-            state = ERROR;
-            ERROR_MISSING_QUOTATION(line);}
+
+        if(i == strlen(lineInput) -1 && state == VALID){ /*reached the end without finding closing quotation mark */
+            ERROR_MISSING_QUOTATION(line);
+            state = ERROR;}
+
+        else if(locAfterSpace(lineInput,i) != strlen(lineInput)-1){
+            ERROR_EXTRANEOUS_END_OF_CMD(line);
+            state = ERROR;}
     }
     else
         state = ERROR;
