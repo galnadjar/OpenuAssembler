@@ -246,7 +246,8 @@ void readFile(FILE* fp,char* fileName) {
 
                     /* case extern / entry*/
                     if (category == EXTERN_FLAG || category == ENTRY_FLAG)
-                        state = handleEntOrExt(&i,lineInput,labelName,line,category,entryTableHead,symbolTableHead);
+                        state = handleEntOrExtCategory(&i, lineInput, labelName, line, category, &entryTableHead,
+                                                       &symbolTableHead);
 
 
                     else if (category == DIRECTIVE_FLAG) {
@@ -298,7 +299,7 @@ int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved
 
 
 /*handle the case when the category given is entry/extern*/
-int handleEntOrExt(int* i,char* lineInput,char* labelName,int line,int category,entryTablePtr entryHead,symbolPtr symHead){
+int handleEntOrExtCategory(int* i, char* lineInput, char* labelName, int line, int category, entryTablePtr* entryHead, symbolPtr* symHead){
 
     int state = VALID;
     (*i) = analyzeLabel(lineInput,*i,line,&labelName);
@@ -308,10 +309,10 @@ int handleEntOrExt(int* i,char* lineInput,char* labelName,int line,int category,
 
         if ((*i) == strlen(lineInput)-1) {
             if (category == ENTRY_FLAG)
-                state = addEntry(&entryHead, labelName, line);
+                state = addEntry(entryHead, labelName, line);
 
             else
-                state = addSymbol(&symHead,labelName,0,EXTERN_AT,line);
+                state = addSymbol(symHead,labelName,0,EXTERN_AT,line);
         }
 
         else {

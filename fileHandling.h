@@ -20,7 +20,7 @@ void openFile(char*);
 void readFile(FILE*,char* fileName);
 void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, int* category);
 void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF);
-int handleEntOrExt(int* i,char* lineInput,char* labelName,int line,int category,entryTablePtr entryHead,symbolPtr symHead);
+int handleEntOrExtCategory(int* i, char* lineInput, char* labelName, int line, int category, entryTablePtr* entryHead, symbolPtr* symHead);
 int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved,int* category,int line);
 int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead);
 int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address);
