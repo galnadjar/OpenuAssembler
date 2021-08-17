@@ -159,18 +159,23 @@ int handleJargs(char* lineInput,int i, int line, long* IC,int opcode,codeImgPtr*
     int state = VALID;
     int reg = 0;
     long address = 0;
-    char* label;
+    char* label = NULL;
     state = setJcmdReg(lineInput,i,line,&reg,&address,opcode,&label);
 
     if(state != ERROR){
-        if(!reg) /*theres a usage with a label*/
-            addToLabelTable(labelTableHead,label,*IC,J_BRANCHING,line);
+        state = addJCodeNode(reg, *IC, address, opcode, imgHead, label, line);
 
-        state = addJCodeNode(reg,*IC,address,opcode,imgHead,label,line);
+        if(label)/*theres a usage with a label*/
+            addToLabelTable(labelTableHead, label, *IC, J_BRANCHING, line);
+
+
         if(!state)
             ERROR_MEMORY_MAXED_OUT(line);}
     else
         state = 0;
+
+    if(label)
+        free(label);
 
     return state;
 }
@@ -181,7 +186,7 @@ int handleIargs(char* lineInput, int i, int line, long* IC,int opcode,codeImgPtr
 
     int rs,rt,state = VALID;
     long immed;
-    char* label;
+    char* label = NULL;
 
     if(opcode == bne || opcode == beq || opcode == bgt || opcode == blt){
             state = setIcmdWithLabel(lineInput, i, line, &rs, &rt, &label);
@@ -197,6 +202,9 @@ int handleIargs(char* lineInput, int i, int line, long* IC,int opcode,codeImgPtr
             ERROR_MEMORY_MAXED_OUT(line);}
     else
         state = 0;
+
+    if(label)
+        free(label);
 
     return state;
 }

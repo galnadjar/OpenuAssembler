@@ -352,6 +352,7 @@ FILE* createWriteFile(char* name,char* extension){
         strcpy(fileName, name);
         strcat(fileName, extension);
         fp = fopen(fileName,"w");
+        free(fileName);
     }
 
     else
@@ -445,6 +446,7 @@ void freeExtSt(externTablePtr* ptr){
 }
 
 void freeLabelSt(labelTablePtr* ptr){
+
     labelTablePtr currLab = (*ptr),tailLab;
     while(currLab){
         tailLab = currLab;

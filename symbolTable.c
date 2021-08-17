@@ -34,8 +34,6 @@ int addSymbol(symbolPtr* symbolHead, char* label, long address, int category, in
             else
                 addNodeToSymbolTable(symbolHead, &ptr);
         }
-
-
     }
     return state;
 }

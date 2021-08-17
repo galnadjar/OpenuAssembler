@@ -71,8 +71,6 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
         }
         if(numLst)
             free(numLst);
-        if(word)
-            free(word);
 
         if(dir == ASCIZ_DIR){
             curr->type = ASCIZ_DIR;

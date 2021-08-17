@@ -35,6 +35,7 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
     switch (dir) {
 
         case ASCIZ_DIR:
+            word = calloc(1,strlen(lineInput)-1);
             state = analAsciz(i, lineInput, line, &word);
             wordCnt = (int)strlen(word);
             break;
@@ -52,6 +53,10 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
             state = 0;
             ERROR_MEMORY_MAXED_OUT(line);}
     }
+
+    if(dir == ASCIZ_DIR)
+        free(word);
+
     return state;
 }
 
@@ -60,7 +65,6 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
 int analAsciz(int i, char* lineInput, int line, char** word){
 
     int state = VALID,wordInd = 0,ch,escapeChar = 0;
-    (*word) = calloc(1,strlen(lineInput)-1);
     i = findQuotation(lineInput, i, line);
 
     if(i){

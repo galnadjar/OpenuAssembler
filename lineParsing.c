@@ -7,8 +7,10 @@ int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int 
     char* word= (char*) calloc(strlen(lineInput), sizeof(char));
     int wordloc = 0,firstLetter = 0,dot = 0;
 
-    for (; (*i) < strlen(lineInput) -1 && state == VALID;(*i)++) {
-       ch = (int)lineInput[(*i)];
+    if(word){
+
+        for (; (*i) < strlen(lineInput) -1 && state == VALID;(*i)++) {
+            ch = (int)lineInput[(*i)];
 
             /*check if the current char is ':' and that we look for a label*/
             if (ch == ':')
@@ -23,7 +25,7 @@ int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int 
                     state = handleDirCase(category, word, line);
 
                 else  /*a word without a dot, should be a label or instruction*/
-                    state = handleLabelOrInstruction(category,word,line);
+                state = handleLabelOrInstruction(category,word,line);
 
             } /*end of isspace*/
 
@@ -33,11 +35,12 @@ int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int 
                 if(state != ERROR)
                     word[wordloc++] = (char) ch;
             }/*end of else*/
+        } /*end of for loop*/
 
-        if(state == EXIT)
-            strcpy(*wordSaved,word);
 
-    } /*end of for loop*/
+        strcpy(*wordSaved,word);
+        free(word);
+    }
     if(state == ERROR)
         (*i) = EXIT;
 
