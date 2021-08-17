@@ -25,7 +25,7 @@ int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved
 int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead);
 int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address);
 void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTablehead,
-                    codeImgPtr* codeImgHead,dataImgPtr* dataImgHead, long DCF, long ICF,char* fp);
+                    codeImgPtr* codeImgHead,dataImgPtr* dataImgHead,externTablePtr* externHead,long DCF, long ICF,char* fp);
 
 void writeEntry(char* name,entryTablePtr entryPtr);
 void writeExtern(char* name, externTablePtr externPtr);

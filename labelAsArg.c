@@ -15,7 +15,7 @@ labelTablePtr getNextLabelNode(labelTablePtr ptr){
     return ptr->next;
 }
 
-
+/*check why my method causes leak*/
 int addToLabelTable(labelTablePtr *head, char* labelName, long address,type branch,int line){
     int state = VALID;
 

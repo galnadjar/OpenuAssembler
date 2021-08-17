@@ -34,23 +34,22 @@ void openFile(char* p){
  * this function responsible for the second iteration, including more validating.
  * if the given assembly file was validated in the second iteration as well, prints it in the required format*/
 void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTablehead,
-                    codeImgPtr* codeImgHead,dataImgPtr* dataImgHead,const long DCF,const long ICF,char* name){
+                    codeImgPtr* codeImgHead,dataImgPtr* dataImgHead,externTablePtr* externHead, const long DCF,const long ICF,char* name){
 
     int state = VALID;
-    externTablePtr externTableHead = (externTablePtr) calloc(1,getExternSize());
+    (*externHead) = (externTablePtr) calloc(1,getExternSize());
 
     addICF(dataImgHead,symbolTableHead,ICF); /*adds the ICF value to the current data addresses*/
-    state = analyzeLabelTable(labelTablehead, symbolTableHead,&externTableHead,codeImgHead,entryTableHead);
+    state = analyzeLabelTable(labelTablehead, symbolTableHead,externHead,codeImgHead,entryTableHead);
     if(state != ERROR){
 
         writeOB(name, *dataImgHead,*codeImgHead,DCF,ICF);
         if(getEntryLine(*entryTableHead)) /*check if head is empty*/
             writeEntry(name,*entryTableHead);
 
-        if(getExternLine(externTableHead))/*check if head is empty*/
-            writeExtern(name,externTableHead);
+        if(getExternLine(*externHead))/*check if head is empty*/
+            writeExtern(name,*externHead);
     }
-    releaseDataTables(symbolTableHead,entryTableHead,labelTablehead,codeImgHead,dataImgHead,&externTableHead); /*check why segmenation*/
 }
 
 
@@ -218,8 +217,9 @@ void readFile(FILE* fp,char* fileName) {
     long IC = IC_INITIAL_ADDRESS, DC = DC_INITIAL_ADDRESS;
     char *wordSaved = NULL,*labelName = NULL,*lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
 
+    externTablePtr  externHead = NULL;
     symbolPtr symbolTableHead = NULL;
-    entryTablePtr entryTableHead = (entryTablePtr) calloc(1,sizeof(getExternSize()));
+    entryTablePtr entryHead = (entryTablePtr) calloc(1, sizeof(getExternSize()));
     codeImgPtr codeImgHead = NULL;
     dataImgPtr dataImgHead = NULL;
     labelTablePtr labelTableHead = (labelTablePtr) calloc(1,sizeof(getLabelTableSize()));
@@ -245,7 +245,7 @@ void readFile(FILE* fp,char* fileName) {
 
                 if(i) {
                     if (category == EXTERN_FLAG || category == ENTRY_FLAG)
-                        state = handleEntOrExtCategory(&i, lineInput, labelName, line, category, &entryTableHead,
+                        state = handleEntOrExtCategory(&i, lineInput, labelName, line, category, &entryHead,
                                                        &symbolTableHead);
 
                     else if (category == DIRECTIVE_FLAG) {
@@ -276,11 +276,12 @@ void readFile(FILE* fp,char* fileName) {
 
     if(DC + IC < MAX_PROG_SIZE){
         if(!wasError)/*no reason for second iteration if errors were found at the first iteration*/
-            secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC + DC,IC,fileName);
+            secondIteration(&symbolTableHead, &entryHead, &labelTableHead, &codeImgHead, &dataImgHead,&externHead, IC + DC, IC, fileName);
     }
     else
         ERROR_MAX_PROG(exceedLine);
 
+    releaseDataTables(&symbolTableHead, &entryHead, &labelTableHead, &codeImgHead, &dataImgHead, &externHead);
     fclose(fp);
 }
 
