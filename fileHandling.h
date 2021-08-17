@@ -9,7 +9,7 @@
 #include "instructionFuncs.h"
 
 
-
+#define MAX_PROG_SIZE 33554432
 #define IC_INITIAL_ADDRESS 100
 #define DC_INITIAL_ADDRESS 0
 #define EXT_LENGTH 3

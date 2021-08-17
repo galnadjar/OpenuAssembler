@@ -39,13 +39,21 @@ typedef struct dataImg{
 /*adds directive nodes,returns 1 if memory allocated properly,and -1 otherwise*/
 int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC,int line,int counter){
 
-    int i,state = VALID,dcBefore = *DC;
-    dataImgPtr arrayHead = (dataImgPtr) calloc(1, sizeof(dataImg));
-    dataImgPtr curr = arrayHead;
-    dataImgPtr temp;
+    int i,state = VALID;
+    dataImgPtr curr,temp;
 
-    if(arrayHead){
-        for(i = 0;i < counter && state == VALID;i++,curr = curr->next){
+    if((*DC) != DC_INITIAL){
+        curr = *imgHead;
+        for(;curr->next;curr = getNextDataNode(curr)); /*gets the pointer to the end the data list*/
+        curr->next = (dataImgPtr) calloc(1,sizeof(dataImg));
+        curr = getNextDataNode(curr);}
+
+    else{
+        (*imgHead) = (dataImgPtr) calloc(1,sizeof(dataImg));
+        curr = *imgHead;}
+
+    if(curr){
+        for(i = 0;i < counter && state == VALID;i++,curr = getNextDataNode(curr)){
             curr->address = *DC;
             curr->type = dir;
             curr->line = line;
@@ -68,16 +76,7 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
 
         if(dir == ASCIZ_DIR){
             curr->type = ASCIZ_DIR;
-            curr->address = *DC;
-            (*DC)++;}
-
-        if(dcBefore == DC_INITIAL)
-            (*imgHead) = arrayHead;
-
-        else{
-            curr = *imgHead;
-            for(;curr->next;curr = curr->next); /*gets the pointer to the end of the list*/
-            curr->next = arrayHead;}
+            curr->address = (*DC)++;}
     }
 
     else
@@ -85,6 +84,28 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
 
     return state;
 }
+
+/*allocate memory to a node and if the allocation was successful,copy a dataNode values and returns 1,otherwise,return -1*/
+int copyDataNodeVals(dataImgPtr* dest, dataImgPtr src){
+
+    int state = VALID;
+
+        (*dest) = calloc(1,sizeof(dataImg));
+        if(*dest){
+            (*dest)->address = src->address;
+            (*dest)->type = src->type;
+            (*dest)->line = src->line;
+            (*dest)->data.display.d1 = src->data.display.d1;
+            (*dest)->data.display.d2 = src->data.display.d2;
+            (*dest)->data.display.d3 = src->data.display.d3;
+            (*dest)->data.display.d4 = src->data.display.d4;
+        }
+        else
+            state = ERROR;
+
+    return state;
+}
+
 
 /*prints the data img to the file based on the type of each node given*/
 void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC,long const DCF){

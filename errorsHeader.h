@@ -14,6 +14,8 @@
 #define ERROR_IMPROPER_DOT(X) printf("ERROR: In line %d, an improper dot was found\n",X)
 #define ERROR_CONSECUTIVE_DOT(X) printf("ERROR: In line %d, multiple consecutive dot were found\n",X)
 
+#define ERROR_MAX_PROG(X) printf("ERROR: In line %d, the file Exceeded the max memory size\n",X)
+
 
 #define ERROR_CONSECUTIVE_COMMA(X) printf("ERROR: In line %d, multiple consecutive commas were found\n",X)
 

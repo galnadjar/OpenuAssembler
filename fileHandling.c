@@ -214,7 +214,7 @@ void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF){
  * calls the second iteration function,otherwise closes file*/
 void readFile(FILE* fp,char* fileName) {
 
-    int i,line = 1, state = VALID,wasError = 0,wasLabel = 0,category = EMPTY_CATEGORY_FLAG;
+    int i,line = 1, state = VALID,wasError = 0,wasLabel = 0,category = EMPTY_CATEGORY_FLAG,exceedLine;
     long IC = IC_INITIAL_ADDRESS, DC = DC_INITIAL_ADDRESS;
     char *wordSaved = NULL,*labelName = NULL,*lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
 
@@ -239,14 +239,11 @@ void readFile(FILE* fp,char* fileName) {
             i = parseCategory(&i, lineInput, &wordSaved, &category, line);/*parses the category of the first word*/
 
             if(i){
-                /*case label*/
                 if (category == LABEL_FLAG){
                     wasLabel = 1;
                     state = handleLabelCategory(&i,lineInput,&labelName,&wordSaved,&category,line);}
 
                 if(i) {
-
-                    /* case extern / entry*/
                     if (category == EXTERN_FLAG || category == ENTRY_FLAG)
                         state = handleEntOrExtCategory(&i, lineInput, labelName, line, category, &entryTableHead,
                                                        &symbolTableHead);
@@ -257,8 +254,7 @@ void readFile(FILE* fp,char* fileName) {
                         if(state)
                             state = checkDirArgs(lineInput, wordSaved, i, line,&DC,&dataImgHead);}
 
-
-                    else { /*category == INSTRUCTION_FLAG*/
+                    else { /*case category == INSTRUCTION_FLAG*/
                         if(wasLabel)
                             state = addSymbol(&symbolTableHead, labelName, IC, CODE_AT, line);
                         if (state)
@@ -268,6 +264,9 @@ void readFile(FILE* fp,char* fileName) {
                 }
             }
         }
+        if(DC + IC == MAX_PROG_SIZE)
+            exceedLine = line;
+
         resetIterVars(&wasLabel, &wordSaved, &labelName, &i, &category);
         line++;
         if(state == ERROR)
@@ -275,8 +274,12 @@ void readFile(FILE* fp,char* fileName) {
     }
     free(lineInput);
 
-    if(!wasError) /*no reason for second iteration if errors were found at the first iteration*/
-        secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC + DC,IC,fileName);
+    if(DC + IC < MAX_PROG_SIZE){
+        if(!wasError)/*no reason for second iteration if errors were found at the first iteration*/
+            secondIteration(&symbolTableHead,&entryTableHead,&labelTableHead,&codeImgHead,&dataImgHead,IC + DC,IC,fileName);
+    }
+    else
+        ERROR_MAX_PROG(exceedLine);
 
     fclose(fp);
 }
