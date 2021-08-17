@@ -37,17 +37,17 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
                     codeImgPtr* codeImgHead,dataImgPtr* dataImgHead,externTablePtr* externHead, const long DCF,const long ICF,char* name){
 
     int state = VALID;
-    (*externHead) = (externTablePtr) calloc(1,getExternSize());
 
     addICF(dataImgHead,symbolTableHead,ICF); /*adds the ICF value to the current data addresses*/
     state = analyzeLabelTable(labelTablehead, symbolTableHead,externHead,codeImgHead,entryTableHead);
     if(state != ERROR){
+        name[strlen(name)-EXT_LENGTH] = '\0';
 
         writeOB(name, *dataImgHead,*codeImgHead,DCF,ICF);
-        if(getEntryLine(*entryTableHead)) /*check if head is empty*/
+        if(*entryTableHead) /*check if head is not empty*/
             writeEntry(name,*entryTableHead);
 
-        if(getExternLine(*externHead))/*check if head is empty*/
+        if(*externHead)/*check if head is not empty*/
             writeExtern(name,*externHead);
     }
 }
@@ -63,7 +63,6 @@ void writeEntry(char* name,entryTablePtr entryPtr){
     fp = createWriteFile(name, extension);
     if(fp)
         printEnt(fp,entryPtr);
-
 }
 
 
@@ -77,7 +76,6 @@ void writeExtern(char* name, externTablePtr externPtr){
     fp = createWriteFile(name, extension);
         if(fp)
             printExt(fp,externPtr);
-
 }
 
 
@@ -219,10 +217,10 @@ void readFile(FILE* fp,char* fileName) {
 
     externTablePtr  externHead = NULL;
     symbolPtr symbolTableHead = NULL;
-    entryTablePtr entryHead = (entryTablePtr) calloc(1, sizeof(getExternSize()));
+    entryTablePtr entryHead = NULL;
     codeImgPtr codeImgHead = NULL;
     dataImgPtr dataImgHead = NULL;
-    labelTablePtr labelTableHead = (labelTablePtr) calloc(1,sizeof(getLabelTableSize()));
+    labelTablePtr labelTableHead = NULL;
 
     while (1) {
 
@@ -341,22 +339,18 @@ void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, in
 }
 
 
-/*creates and return a valid file pointer if memory allow this allocation,otherwise returns null*/
+/*creates and return a valid file pointer if memory allow file allocation,otherwise returns null*/
 FILE* createWriteFile(char* name,char* extension){
+
     FILE* fp = NULL;
-    char* fileName = NULL;
-    fileName = (char*) calloc(strlen(name) + strlen(extension), sizeof(char));
+    char fileName[strlen(name) + strlen(extension)+1];
+    strcpy(fileName, name);
+    strcat(fileName, extension);
 
-    if(fileName){
-        name[strlen(name)-EXT_LENGTH] = '\0';
-        strcpy(fileName, name);
-        strcat(fileName, extension);
-        fp = fopen(fileName,"w");
-        free(fileName);
-    }
+    fp = fopen(fileName,"w");
+    if(!fp)
+        ERROR_MEMORY_ALLOCATION(fileName);
 
-    else
-        ERROR_MEMORY_ALLOCATION(name);
     return fp;
 }
 

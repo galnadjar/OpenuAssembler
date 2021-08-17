@@ -64,7 +64,7 @@
 #define ERROR_JUMP_OUT_OF_BOUNDS(X) printf("ERROR: In line %d the jumping destination was out of bounds",X)
 
 
-#define ERROR_MEMORY_ALLOCATION(X) printf("ERROR: system couldn't allocate space for 1 of \"%s\" files on the disk\n",X)
+#define ERROR_MEMORY_ALLOCATION(X) printf("ERROR: system couldn't allocate space for \"%s\" file on the disk\n",X)
 
 
 #define VALID 1

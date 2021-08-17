@@ -19,8 +19,7 @@ labelTablePtr getNextLabelNode(labelTablePtr ptr){
 int addToLabelTable(labelTablePtr *head, char* labelName, long address,type branch,int line){
     int state = VALID;
 
-    labelTablePtr p = (*head);
-    labelTablePtr temp;
+    labelTablePtr p = (*head),temp;
 
     temp = (labelTablePtr) calloc(1,sizeof(labelTable));
 
@@ -30,7 +29,7 @@ int addToLabelTable(labelTablePtr *head, char* labelName, long address,type bran
         temp->branch = branch;
         temp->line = line;
 
-        if(!(getLabelBranch(p))){/*head is empty*/
+        if(!(*head)){/*head is empty*/
             (*head) = temp;}
 
         else{

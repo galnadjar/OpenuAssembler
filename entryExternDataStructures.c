@@ -23,19 +23,14 @@ int addEntry(entryTablePtr* entryHead,char* label,int line){
     entryTablePtr ptrEnt;
     int state = VALID;
 
-     ptrEnt = findEntryLabel(entryHead,label);
+    ptrEnt = findEntryLabel(entryHead,label);
 
-    if(ptrEnt) /*doesn't do anything if already exists*/
-        state = EXIT;
-
-    else
+    if(!ptrEnt) /*if doesn't exist*/
         state = handleEntNode(label,entryHead,line);
 
     if(state == ERROR){
         ERROR_MEMORY_MAXED_OUT(line);
         state = 0;}
-    else
-        state = 1;
 
     return state;
 }
@@ -54,7 +49,7 @@ int handleEntNode(char* label,entryTablePtr* entryHead,int line){
         strcpy(tempEnt->label,label);
         tempEnt->line = line;
 
-        if(getEntryLine(*entryHead)){ /*check if the head is not empty*/
+        if((*entryHead)){ /*check if the head is not empty*/
             for(currEnt = (*entryHead);currEnt->next;currEnt = currEnt->next);
             currEnt->next = tempEnt;}
 
@@ -80,6 +75,7 @@ entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word){
 
 /*used to hold the ext file we going to print, returns 1 if no error,and -1 if memory allocation error found*/
 int addToExtTable(externTablePtr *tableHead, char* word, long address,int line){
+
     externTablePtr node;
     externTablePtr curr = *tableHead;
     int state = VALID;
@@ -90,7 +86,7 @@ int addToExtTable(externTablePtr *tableHead, char* word, long address,int line){
         node->address = address;
         node->line = line;
 
-        if(!(curr->line))
+        if(!(curr)) /*means that the table is empty*/
             (*tableHead) = node;
 
         else{
