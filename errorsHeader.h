@@ -25,7 +25,7 @@
 #define ERROR_IMPROPER_INSTRUCTION_NAME(X) printf("ERROR: In line %d, an improper instruction name was found\n",X)
 #define ERROR_IMPROPER_DIRECTIVE_NAME(X) printf("ERROR: In line %d, an improper directive word was found\n",X)
 #define ERROR_INVALID_PLACEMENT_OF_DIGIT(X) printf("ERROR: In line %d, an invalid placement of digit was found\n",X)
-#define ERROR_INVALID_CHAR(X,Y) printf("ERROR: In line %d, the char \"%c\" which is invalid in its pos was found\n",X,Y)
+#define ERROR_INVALID_CHAR(X,Y) printf("ERROR: In line %d, extraneous text starts with the char \"%c\" was found\n",X,Y)
 
 
 

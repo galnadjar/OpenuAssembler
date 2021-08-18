@@ -87,6 +87,8 @@ int handleEntOrExtCategory(int* i, char* lineInput, char* labelName, int line, i
             ERROR_EXTRANEOUS_END_OF_CMD(line);
             state = ERROR;}
     }
+    else
+        state = ERROR;
     return state;
 }
 

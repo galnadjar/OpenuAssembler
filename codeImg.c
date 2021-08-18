@@ -102,8 +102,8 @@ int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,cha
             strcpy(temp->label,label);
 
 
-        if(IC > 100){
-            for(; curr->next; curr = curr->next);
+        if(*imgHead){
+            for(;curr->next; curr = curr->next);
             curr->next = temp;}
 
         else

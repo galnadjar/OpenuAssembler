@@ -72,13 +72,13 @@ void readFile(FILE* fp,char* fileName) {
                     else if (category == DIRECTIVE_FLAG) {
                         if(wasLabel)
                             state = addSymbol(&symbolTableHead, labelName, DC, DATA_AT, line);
-                        if(state)
+                        if(state != ERROR)
                             state = checkDirArgs(lineInput, wordSaved, i, line,&DC,&dataImgHead);}
 
                     else { /*case category == INSTRUCTION_FLAG*/
                         if(wasLabel)
                             state = addSymbol(&symbolTableHead, labelName, IC, CODE_AT, line);
-                        if (state)
+                        if (state != ERROR)
                             state = checkInsArgs(lineInput, wordSaved, i, line, &IC, &codeImgHead,&labelTableHead);
                         IC += 4;
                     }
@@ -125,6 +125,8 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
 
         if(*externHead)/*check if head is not empty*/
             writeExtern(name,*externHead);
+
+        printf("file given was valid, output files were created accordingly.\n");
     }
 }
 
@@ -146,7 +148,6 @@ void addICF(dataImgPtr* dataImgHead,symbolPtr* symbolHead,long ICF){
         currSymbol = getSymbolNextNode(currSymbol);
     }
 }
-
 
 
 /*resets the iteration variables so they will be empty for the next iteration*/
