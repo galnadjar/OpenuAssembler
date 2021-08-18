@@ -48,12 +48,11 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
                 break;
     }
 
-    if(state){
+    if(state != ERROR){
         state = addDirNodes(ImgHead, word, numLst, dir, DC,line,(dir == ASCIZ_DIR?wordCnt:numberCnt));
-        if(state == ERROR){
-            state = 0;
+        if(state == ERROR)
             ERROR_MEMORY_MAXED_OUT(line);}
-    }
+
 
     if(dir == ASCIZ_DIR)
         free(word);
@@ -64,7 +63,7 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
 }
 
 
-/*analyze asciz string, if the analysis was valid return 1, otherwise returns 0*/
+/*analyze asciz string, if the analysis was valid return 1, otherwise returns -1*/
 int analAsciz(int i, char* lineInput, int line, char** word){
 
     int state = VALID,wordInd = 0,ch,escapeChar = 0;
@@ -93,17 +92,14 @@ int analAsciz(int i, char* lineInput, int line, char** word){
     else
         state = ERROR;
 
-    if(state == ERROR)
-        state = 0;
-
-    else
+    if(state == EXIT)
         state = VALID;
 
     return state;
 }
 
 
-/*returns 1 if was valid operation, otherwise 0*/
+/*returns 1 if was valid operation, otherwise -1*/
 int analNumLst(int i, char* lineInput, int line, long** numLst, int dir,int* numberCnt){
 
     int numInd = 0,state = VALID;
@@ -138,17 +134,12 @@ int analNumLst(int i, char* lineInput, int line, long** numLst, int dir,int* num
         }
         if(state == EXIT)
             state = VALID;
-
-        else
-            state = 0;
     }
 
     else{
         state = ERROR;
         ERROR_MEMORY_MAXED_OUT(line);
     }
-
-
     return state;
 }
 

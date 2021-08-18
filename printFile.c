@@ -24,8 +24,10 @@ void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,con
     fp = createWriteFile(name,ob);
     if(fp){
         printCounters(fp,ICF,DCF);
-        printCodeImg(fp,codePtr);
-        printDataImg(fp,dataPtr,ICF,DCF);
+        if(codePtr)
+            printCodeImg(fp,codePtr);
+        if(dataPtr)
+            printDataImg(fp,dataPtr,ICF,DCF);
     }
 }
 

@@ -77,12 +77,11 @@ int getOpCode(char* instruction){
     return code;
 }
 
-/*returns 1 if args were valid, and 0 if invalid args were found*/
+/*returns 1 if args were valid, and -1 if invalid args were found*/
 int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead){
 
     int state = VALID,funct;
     int opcode = getOpCode(instruction);
-
     if(opcode < I_CMD_MIN_OPCODE){/*all R type instructs*/
         funct = getFunct(instruction,opcode);
         state = handleRargs(lineInput,i,line,IC,opcode,funct,imgHead);
@@ -93,6 +92,9 @@ int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeI
 
     else /*all I type instructs*/
         state = handleIargs(lineInput,i, line,IC,opcode,imgHead,labelTableHead);
+
+    if(state == 0)
+        state = ERROR;
 
     return state;
 }
@@ -146,8 +148,6 @@ int handleRargs(char* lineInput, int i, int line,long* IC,int opcode,int funct,c
         if(!state)
             ERROR_MEMORY_MAXED_OUT(line);}
 
-    else
-        state = 0;
 
     return state;
 }

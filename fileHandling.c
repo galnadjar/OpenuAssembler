@@ -82,6 +82,8 @@ void readFile(FILE* fp,char* fileName) {
                     }
                 }
             }
+            else
+                state = ERROR;
 
             if(DC + IC == MAX_PROG_SIZE)
                 exceedLine = line;

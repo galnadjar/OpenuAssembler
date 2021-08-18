@@ -39,7 +39,16 @@ int parseCategory(int i, char* lineInput, char** wordSaved, int* category, int l
             }/*end of else*/
         } /*end of for loop*/
 
-        strcpy(*wordSaved,word);
+        if(i == strlen(lineInput)-1 && state != ERROR){
+
+            if (dot > 0)  /*a dot was passed in already,so we check if it's a start of directive name*/
+                state = handleDirCase(category, word, line);
+
+            else  /*a word without a dot, should be a label or instruction*/
+                state = handleLabelOrInstruction(category,word,line);
+        }
+        if(state != ERROR)
+            strcpy(*wordSaved,word);
         free(word);
     }
     if(state == ERROR)
@@ -243,7 +252,7 @@ int analyzeChar(int* dot,int ch,int* firstLetter,int line){
 
 /*a dot was found in the beginning of the word, during parseCategory func analyze,
  * so an exam if a proper directive name is being done in this function
- * if valid returns 1
+ * if valid returns 0
  * otherwise,if invalid returns -1*/
 int handleDirCase(int* category, char* word, int line){
 
