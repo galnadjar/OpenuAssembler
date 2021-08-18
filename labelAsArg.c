@@ -11,11 +11,13 @@ typedef struct labelTable{
     labelTablePtr next;
 }labelTable;
 
+
+
 labelTablePtr getNextLabelNode(labelTablePtr ptr){
     return ptr->next;
 }
 
-/*check why my method causes leak*/
+
 int addToLabelTable(labelTablePtr *head, char* labelName, long address,type branch,int line){
     int state = VALID;
 
@@ -42,22 +44,26 @@ int addToLabelTable(labelTablePtr *head, char* labelName, long address,type bran
     return state;
 }
 
+
+/*returns the type of the node*/
 int getLabelBranch(labelTablePtr ptr){
     return ptr->branch;
 }
 
+
+/*returns the line of the node*/
 int getLabelTableLine(labelTablePtr ptr){
     return ptr->line;
 }
 
+
+/*returns the address of the node*/
 long getLabelTableAddress(labelTablePtr ptr){
     return ptr->address;
 }
 
+
+/*returns the label of the node*/
 char* getLabelTableName(labelTablePtr ptr){
     return ptr->labelName;
-}
-
-int getLabelTableSize(){
-    return sizeof(labelTable);
 }

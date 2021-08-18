@@ -1,5 +1,7 @@
 #include "entryExternDataStructures.h"
 
+/*data structures for entry and extern symbols*/
+
 typedef struct entryTable{
 
     char label[MAX_LABEL_LENGTH+1];
@@ -18,6 +20,9 @@ typedef struct externTable{
 
 }externTable;
 
+
+
+/*if not exist in the table and also memory is available adds an entry node and returns 1,otherwise returns 0*/
 int addEntry(entryTablePtr* entryHead,char* label,int line){
 
     entryTablePtr ptrEnt;
@@ -35,11 +40,14 @@ int addEntry(entryTablePtr* entryHead,char* label,int line){
     return state;
 }
 
+
+/*sets a new entry address to a given node*/
 void setEntryAddress(entryTablePtr* ptr ,long address){
     (*ptr)->address = address;
 }
 
-/*returns 1 if valid allocation of new node, -1 otherwise*/
+
+/*handles the actual adding of the entry node to the table returns 1 if valid allocation of new node, -1 otherwise*/
 int handleEntNode(char* label,entryTablePtr* entryHead,int line){
     int state = VALID;
     entryTablePtr tempEnt,currEnt;
@@ -58,9 +66,12 @@ int handleEntNode(char* label,entryTablePtr* entryHead,int line){
     }
     else
         state = ERROR;
+
     return state;
 }
 
+
+/*search in the entry table for an entry label with a matching name to the given label,if found return its address,otherwise null*/
 entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word){
     entryTablePtr node = NULL;
     entryTablePtr curr = *entryTableHead;
@@ -73,7 +84,8 @@ entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word){
 
 }
 
-/*used to hold the ext file we going to print, returns 1 if no error,and -1 if memory allocation error found*/
+
+/*if the allocation for the new node is valid,adds a new ext node to the ext data table and returns 1,otherwise,-1*/
 int addToExtTable(externTablePtr *tableHead, char* word, long address,int line){
 
     externTablePtr node;
@@ -101,39 +113,54 @@ int addToExtTable(externTablePtr *tableHead, char* word, long address,int line){
     return state;
 }
 
+
+/*updates an entry symbol address if found and then returns 1 ,otherwise if not found returns -1*/
+int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address){
+
+    int state = ERROR; /*meaning entry wasn't found yet*/
+
+    entryTablePtr entryPtr = (*entryHead);
+    for(;entryPtr;entryPtr = getNextEntNode(entryPtr)){ /*iterating through the entry table*/
+        if(!strcmp(getEntryLabel(entryPtr), label)){
+            state = VALID;
+            setEntryAddress(&entryPtr,address);
+        }
+    }
+    return state;
+}
+
+
+/*returns the label of the current entry node*/
 char* getEntryLabel(entryTablePtr ptr){
     return ptr->label;
 }
 
+
+/*returns the label of the current extern node*/
 char* getExternLabel(externTablePtr ptr){
     return ptr->label;
 }
 
-long getExternSize(){
-    return sizeof(externTable);
-}
 
+/*returns the address of the current extern node*/
 long getExtAddress(externTablePtr ptr){
     return ptr->address;
 }
 
+
+/*returns the address of the current entry node*/
 long getEntAddress(entryTablePtr ptr){
     return ptr->address;
 }
 
-int getEntryLine(entryTablePtr ptr){
-    return ptr->line;
-}
 
+/*returns the next node to the current extern node*/
 externTablePtr getNextExtNode(externTablePtr ptr){
     return ptr->next;
 }
+
+
+/*returns the next node to the current entry node*/
 entryTablePtr getNextEntNode(entryTablePtr ptr){
     return ptr->next;
 }
-
-int getExternLine(externTablePtr ptr){
-    return ptr->line;
-}
-
-
