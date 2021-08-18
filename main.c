@@ -21,8 +21,10 @@ int main(int argc,char* argv[]) {
             if (!state)
                 ERROR_WRONG_EXTENSION(argv[i]);
 
-            else
+            else{
                 openFile(argv[i]);
+                if(i < argc-1)
+                    printf("\n\n");}
         }
     }
     return 0;

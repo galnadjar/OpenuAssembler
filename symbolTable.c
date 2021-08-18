@@ -16,7 +16,7 @@ int addSymbol(symbolPtr* symbolHead, char* label, long address, int category, in
 
     int state = VALID;
     symbolPtr temp,ptr;
-    temp = findSymbolLabel(symbolHead, label); /*check if a symbol is already exist in the table*/
+    temp = findSymbol(symbolHead, label); /*check if a symbol is already exist in the table*/
     if(temp){
         if(temp->type == EXTERN_AT && category == EXTERN_AT)
             state = VALID;
@@ -55,7 +55,7 @@ void addNodeToSymbolTable(symbolPtr* head,symbolPtr* desired){
 
 
 /*return the node if found otherwise returns null*/
-symbolPtr findSymbolLabel(symbolPtr* symbolTableHead, char* word){
+symbolPtr findSymbol(symbolPtr* symbolTableHead, char* word){
 
     symbolPtr match = NULL;
     symbolPtr ptr = *symbolTableHead;

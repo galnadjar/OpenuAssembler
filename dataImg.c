@@ -69,8 +69,6 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
                     state = ERROR;
             }
         }
-        if(numLst)
-            free(numLst);
 
         if(dir == ASCIZ_DIR){
             curr->type = ASCIZ_DIR;

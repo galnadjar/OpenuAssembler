@@ -54,9 +54,10 @@ int analyzeLabel(char* lineInput, int i, int line, char** label){
     if(state == ERROR)
         i = ERROR;
 
-    else{
+    else
         strcpy((*label),word);
-        free(word);}
+
+    free(word);
 
     return i;
 }

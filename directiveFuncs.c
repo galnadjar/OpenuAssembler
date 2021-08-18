@@ -43,6 +43,7 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
             case DB_DIR:
             case DW_DIR:
             default: /*case DH_DIR*/
+                numLst = (long*) calloc(strlen(lineInput)-1,sizeof(long));
                 state = analNumLst(i, lineInput, line, &numLst, dir,&numberCnt);
                 break;
     }
@@ -56,6 +57,8 @@ int checkDirArgs(char* lineInput,char* directive, int i,int line,long* DC,dataIm
 
     if(dir == ASCIZ_DIR)
         free(word);
+    else
+        free(numLst);
 
     return state;
 }
@@ -106,10 +109,8 @@ int analNumLst(int i, char* lineInput, int line, long** numLst, int dir,int* num
     int numInd = 0,state = VALID;
     long num,minVal,maxVal;
     int comma = 0;
-    (*numLst) = (long*) calloc(strlen(lineInput)-1,sizeof(long));
 
     if(*numLst){
-
         adjustValues(&minVal,&maxVal,dir);
 
         for(;i < strlen(lineInput) -1 && state == VALID;i++){
@@ -132,6 +133,8 @@ int analNumLst(int i, char* lineInput, int line, long** numLst, int dir,int* num
                         state = ERROR;}
                 }
             }
+            else
+                state = ERROR;
         }
         if(state == EXIT)
             state = VALID;

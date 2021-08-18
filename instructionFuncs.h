@@ -22,32 +22,36 @@ typedef enum opcode opcode;
 
 
 int getOpCode(char* instruction);
+
 int getFunct(char* instruction,int opcode);
 
 int analJmp(char* lineInput,int i,int line,int* reg,long* address,char** label);
-int analStop(char* lineInput,int i,int line);
 
 int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode);
-int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,char** label);
 
+int setJcmdReg(char* lineInput,int i,int line,int* reg,long* address,int opcode,char** label);
 
 int checkInsArgs(char* lineInput,char* instruction,int i,int line,long* IC,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
 
 int handleRargs(char* lineInput, int i, int line,long* IC,int opcode,int funct,codeImgPtr* imgHead);
+
 int handleJargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
+
 int handleIargs(char* lineInput, int i, int line,long* IC,int opcode,codeImgPtr* imgHead,labelTablePtr* labelTableHead);
 
-
 int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char** label);
+
 int setIcmdWithoutLabel(char* lineInput,int i,int line,int* rs,long* immed,int* rt);
 
 int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq);
 
 int handleRegSpace(int digit,int* reg,int regNum,int line);
+
 int handleRegDigit(int regSign,int* digit,int* regNum,int ch,int line);
+
 int handleRegComma(int* reg,int regNum,int line,int ch,int digit,int regSign, int commaReq);
 
-int checkFirstLetter(char* lineInput,int i);
+int checkFirstLetter(char* lineInput,int* i);
 
 #define REG_OPTION 0
 #define LABEL_OPTION 1

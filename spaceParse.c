@@ -26,7 +26,7 @@ int isEmptyLine(char* lineInput){
     return !state;
 }
 
-/*returns the first letter encountered / end of line*/
+/*returns the index of the first letter encountered / end of line*/
 int locAfterSpace(char* lineInput,int i){
     int state = VALID,ch;
 

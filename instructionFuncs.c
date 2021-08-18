@@ -388,42 +388,51 @@ int analStop(char* lineInput,int i,int line){
 int analJmp(char* lineInput,int i,int line,int* reg,long* address,char** labelName) {
 
     int option;
-    option = checkFirstLetter(lineInput, i); /*based on the first letter ,selects which arg will be received*/
+    if(locAfterSpace(lineInput,i) != strlen(lineInput)-1){
 
-    switch (option) {
+        option = checkFirstLetter(lineInput, &i); /*based on the first letter ,selects which arg will be received*/
 
-        case REG_OPTION:
-            i = checkAndSetReg(lineInput,i,line,(int*)address,0);
-            if(i != ERROR)
-                (*reg) = 1;
-            break;
+        switch (option) {
 
-        case LABEL_OPTION:
-            (*labelName) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
-            i = analyzeLabel(lineInput,i,line,labelName);
-            if(i != ERROR)
-                (*reg) = 0;
-            break;
+            case REG_OPTION:
+                i = checkAndSetReg(lineInput,i,line,(int*)address,0);
+                if(i != ERROR)
+                    (*reg) = 1;
+                break;
+
+                case LABEL_OPTION:
+                    (*labelName) = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
+                    i = analyzeLabel(lineInput,i,line,labelName);
+                    if(i != ERROR)
+                        (*reg) = 0;
+                    break;
 
 
-        default:/*first letter that was passed as an instruction arg was invalid*/
-            i = ERROR;
-            ERROR_INVALID_CHAR(line, lineInput[locAfterSpace(lineInput, i)]);
-            break;
+                    default:/*first letter that was passed as an instruction arg was invalid*/
+                    ERROR_INVALID_CHAR(line, lineInput[i]);
+                    i = ERROR;
+                    break;
 
+        }
     }
+    else
+        ERROR_EMPTY_INSTRUCTION(line);
+
     return i;
 }
 
 
-/*check if the first letter given is directed to a register or labelname*/
-int checkFirstLetter(char* lineInput,int i){
+/*check if the first letter given is directed to a registry or a label,also modifies 'i' index for later use
+ * if registry returns 0
+ * if label returns 1
+ * if neither returns -1*/
+int checkFirstLetter(char* lineInput,int* i){
     int option;
     int state = VALID,ch;
-    for(;i < strlen(lineInput)-1 && state == VALID;i++){
-        ch = (int)lineInput[i];
+    for(;(*i) < strlen(lineInput)-1 && state == VALID;(*i)++){
+        ch = (int)lineInput[(*i)];
         if(isspace(ch))
-            i = locAfterSpace(lineInput,i)-1;
+            (*i) = locAfterSpace(lineInput,(*i))-1;
 
         else{
             if(ch == '$')
@@ -432,12 +441,13 @@ int checkFirstLetter(char* lineInput,int i){
             else if(isalpha(ch))
                 option = LABEL_OPTION;
 
-            else{
+            else
                 option = ERROR;
-            }
+
             state = EXIT;
         }
     }
+    (*i)--;
     return option;
 }
 

@@ -25,7 +25,6 @@ void openFile(char* p){
     if(state){
         printf("%s%s file%s\n",UNDERLINE,p,CLOSEUNDERLINE);
         readFile(fp,p);
-        printf("\n\n");
     }
 }
 
@@ -38,11 +37,11 @@ void readFile(FILE* fp,char* fileName) {
     long IC = IC_INITIAL_ADDRESS, DC = DC_INITIAL_ADDRESS;
     char *wordSaved = NULL,*labelName = NULL,*lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
 
-    externTablePtr  externHead = NULL;
-    symbolPtr symbolTableHead = NULL;
-    entryTablePtr entryHead = NULL;
-    codeImgPtr codeImgHead = NULL;
-    dataImgPtr dataImgHead = NULL;
+    externTablePtr  extHead = NULL;
+    symbolPtr symHead = NULL;
+    entryTablePtr entHead = NULL;
+    codeImgPtr codeHead = NULL;
+    dataImgPtr dataHead = NULL;
     labelTablePtr labelTableHead = NULL;
 
     while (1) {
@@ -57,7 +56,7 @@ void readFile(FILE* fp,char* fileName) {
 
             labelName =  (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
             wordSaved = (char*) calloc(MAX_LABEL_LENGTH+1,sizeof(char));
-            i = parseCategory(&i, lineInput, &wordSaved, &category, line);/*parses the category of the first word*/
+            i = parseCategory(i, lineInput, &wordSaved, &category, line);/*parses the category of the first word*/
 
             if(i){
                 if (category == LABEL_FLAG){
@@ -66,42 +65,43 @@ void readFile(FILE* fp,char* fileName) {
 
                 if(i) {
                     if (category == EXTERN_FLAG || category == ENTRY_FLAG)
-                        state = handleEntOrExtCategory(&i, lineInput, labelName, line, category, &entryHead,
-                                                       &symbolTableHead);
+                        state = handleEntOrExtCategory(i, lineInput, labelName, line, category, &entHead, &symHead);
 
                     else if (category == DIRECTIVE_FLAG) {
                         if(wasLabel)
-                            state = addSymbol(&symbolTableHead, labelName, DC, DATA_AT, line);
+                            state = addSymbol(&symHead, labelName, DC, DATA_AT, line);
                         if(state != ERROR)
-                            state = checkDirArgs(lineInput, wordSaved, i, line,&DC,&dataImgHead);}
+                            state = checkDirArgs(lineInput, wordSaved, i, line,&DC,&dataHead);}
 
                     else { /*case category == INSTRUCTION_FLAG*/
                         if(wasLabel)
-                            state = addSymbol(&symbolTableHead, labelName, IC, CODE_AT, line);
+                            state = addSymbol(&symHead, labelName, IC, CODE_AT, line);
                         if (state != ERROR)
-                            state = checkInsArgs(lineInput, wordSaved, i, line, &IC, &codeImgHead,&labelTableHead);
+                            state = checkInsArgs(lineInput, wordSaved, i, line, &IC, &codeHead, &labelTableHead);
                         IC += 4;
                     }
                 }
             }
-        }
-        if(DC + IC == MAX_PROG_SIZE)
-            exceedLine = line;
 
-        resetIterVars(&wasLabel, &wordSaved, &labelName, &i, &category);
+            if(DC + IC == MAX_PROG_SIZE)
+                exceedLine = line;
+
+            resetIterVars(&wasLabel, &wordSaved, &labelName, &i, &category);
+        }
         line++;
         if(state == ERROR)
             wasError = 1;
     }
+
     free(lineInput);
 
     if(DC + IC < MAX_PROG_SIZE){
         if(!wasError)/*no reason for second iteration if errors were found at the first iteration*/
-            secondIteration(&symbolTableHead, &entryHead, &labelTableHead, &codeImgHead, &dataImgHead,&externHead, IC + DC, IC, fileName);}
+            secondIteration(&symHead, &entHead, &labelTableHead, &codeHead, &dataHead, &extHead, IC + DC, IC, fileName);}
     else
         ERROR_MAX_PROG(exceedLine);
 
-    releaseDataTables(&symbolTableHead, &entryHead, &labelTableHead, &codeImgHead, &dataImgHead, &externHead);
+    releaseDataTables(&symHead, &entHead, &labelTableHead, &codeHead, &dataHead, &extHead);
     fclose(fp);
 }
 
@@ -129,7 +129,6 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
         printf("file given was valid, output files were created accordingly.\n");
     }
 }
-
 
 
 

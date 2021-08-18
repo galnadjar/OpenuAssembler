@@ -1,7 +1,9 @@
 #include "lineParsing.h"
 
-/*parseFirstWord returns 0 if theres been an error ,and 1 if the word was recieved successfuly*/
-int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int line) {
+/*parseCategory parses and analyzes the category of a given first/second arg in the line of input
+ * returns 0 if there's been an error throughout the analysis
+ * returns the end index if the analyzed arg corresponds to the given rules,and update "category", "wordSaved","i" vars*/
+int parseCategory(int i, char* lineInput, char** wordSaved, int* category, int line) {
 
     int ch,state = VALID;
     char* word= (char*) calloc(strlen(lineInput), sizeof(char));
@@ -9,17 +11,17 @@ int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int 
 
     if(word){
 
-        for (; (*i) < strlen(lineInput) -1 && state == VALID;(*i)++) {
-            ch = (int)lineInput[(*i)];
+        for (; i < strlen(lineInput) -1 && state == VALID;i++) {
+            ch = (int)lineInput[i];
 
             /*check if the current char is ':' and that we look for a label*/
-            if (ch == ':')
-                state = handleColon(word,category,firstLetter,line,ch);/*no word was previously saved*/
+            if (ch == ':'){
+                    state = handleColon(word,category,firstLetter,line,ch);}
 
             else if (isspace(ch)) {
 
                 if (!firstLetter && !dot) /*means its space before anything so we jump to the first letter*/
-                    (*i) = locAfterSpace(lineInput, *i) - 1;
+                    i = locAfterSpace(lineInput, i) - 1;
 
                 else if (dot > 0)  /*a dot was passed in already,so we check if it's a start of directive name*/
                     state = handleDirCase(category, word, line);
@@ -37,16 +39,14 @@ int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int 
             }/*end of else*/
         } /*end of for loop*/
 
-
         strcpy(*wordSaved,word);
         free(word);
     }
     if(state == ERROR)
-        (*i) = EXIT;
+        i = 0;
 
-    return *i;
+    return i;
 } /*end of parseFirstWord func*/
-
 
 
 /*this function handles the case when the category given is a label*/
@@ -56,7 +56,7 @@ int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved
 
     if(isspace(lineInput[(*i)])) { /*check that after the ':' theres a spacing*/
         strcpy(*labelName,*wordSaved);
-        (*i) = parseCategory(i, lineInput, wordSaved, category, line);}
+        (*i) = parseCategory(*i, lineInput, wordSaved, category, line);}
 
     else{
         (*i) = 0;
@@ -67,33 +67,51 @@ int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved
 
 
 /*handle the case when the category given is entry/extern*/
-int handleEntOrExtCategory(int* i, char* lineInput, char* labelName, int line, int category, entryTablePtr* entryHead, symbolPtr* symHead){
+int handleEntOrExtCategory(int i, char* lineInput, char* label, int line, int category, entryTablePtr* entryHead, symbolPtr* symHead){
 
+    symbolPtr symNode = NULL;
+    entryTablePtr entNode = NULL;
     int state = VALID;
-    (*i) = analyzeLabel(lineInput,*i,line,&labelName);
+    i = analyzeLabel(lineInput,i,line,&label);
 
-    if ((*i) != ERROR) {
-        (*i) = locAfterSpace(lineInput, *i);
 
-        if ((*i) == strlen(lineInput)-1) {
-            if (category == ENTRY_FLAG)
-                state = addEntry(entryHead, labelName, line);
+    if (i != ERROR) {
+        i = locAfterSpace(lineInput, i);
 
-            else
-                state = addSymbol(symHead,labelName,0,EXTERN_AT,line);
+        if (i == strlen(lineInput)-1) {
+
+            if (category == ENTRY_FLAG){
+                symNode = findSymbol(symHead,label);
+                if(symNode && getSymbolType(symNode) == EXTERN_AT){
+                    state = ERROR;
+                    ERROR_EXTERN_ENTRY_MIX(line,label);}
+                else
+                    state = addEntry(entryHead, label, line);}
+
+
+            else{ /*category == EXTERN_FLAG*/
+                entNode = findEntryLabel(entryHead, label);
+                if(entNode){
+                    state = ERROR;
+                    ERROR_EXTERN_ENTRY_MIX(line,label);
+                }
+
+                else
+                    state = addSymbol(symHead, label, 0, EXTERN_AT, line);}
         }
-
         else {
             ERROR_EXTRANEOUS_END_OF_CMD(line);
             state = ERROR;}
     }
     else
         state = ERROR;
+
     return state;
 }
 
-
-int validDirectiveName(char* word){
+/*a function that matches a given directive name to the actual directive names.
+ * returns 1 if the label corresponds to one of the options,otherwise returns -1*/
+int validDirName(char* word){
 
     char dw[] = ".dw" ,db[] = ".db" ,dh[] = ".dh", asciz[] = ".asciz", ext[] = ".extern",ent[] = ".entry";
 
@@ -102,11 +120,13 @@ int validDirectiveName(char* word){
 }
 
 
-
-int validDotStart(int dot,int firstLetter,int line){
+/*a function that checks if the dot received is valid,
+ * if it is, returns 1,
+ * otherwise, return 0*/
+int dotValidation(int dot, int firstLetter, int line){
 
     int ans;
-    if (!dot && !firstLetter)
+    if (!dot && !firstLetter) /*a dot before letter,which is also not consecutive*/
         ans = VALID;
 
     else { /*a misplacement of a dot - error*/
@@ -123,7 +143,7 @@ int validDotStart(int dot,int firstLetter,int line){
 }
 
 
-
+/*a function that matches an error to the given state*/
 void invalidCategoryArgs(int line, int category){
 
     if((category) == DIRECTIVE_FLAG)
@@ -137,18 +157,17 @@ void invalidCategoryArgs(int line, int category){
 }
 
 
-
+/*a function that handles 2 cases of label errors based on the state*/
 void labelNameError(int line,char* word){
     if (strlen(word) > MAX_LABEL_LENGTH)/*the label length is too long*/
         ERROR_LABEL_LENGTH(line);
 
     else /*meaning its not a valid label name*/
         ERROR_LABEL_NAME(line);
-
 }
 
 
-
+/*sets the directive category based on the match with those given strings*/
 void directiveCategorySelector(int* category,char* word){
 
     if(!strcmp(word,".entry"))
@@ -163,11 +182,13 @@ void directiveCategorySelector(int* category,char* word){
 }
 
 
-
+/*used by parseCategory, this function analyzes a given label(since ended with a colon).
+ * returns 0 if a valid label and matches in its placement
+ * returns -1 if either the label is invalid or the colon position is */
 int handleColon(char* word,int* category,int firstLetter,int line ,int ch){
     int ans,state = VALID;
 
-    if ((*category) == EMPTY_CATEGORY_FLAG && firstLetter) {
+    if ((*category) == EMPTY_CATEGORY_FLAG && firstLetter) { /*it's the first word, and a letter was given*/
         ans = validLabelORInstruction(word, LABEL_SEARCH);/*check if the given label is valid*/
 
         if (ans && strlen(word) <= MAX_LABEL_LENGTH) {
@@ -179,8 +200,8 @@ int handleColon(char* word,int* category,int firstLetter,int line ,int ch){
             state = ERROR;
         }
     }
-    /*its an invalid positioning of the char ':' */
-    else if(!firstLetter){
+    /*an invalid positioning of the char ':' */
+    else{
         ERROR_INVALID_CHAR(line,ch);
         state = ERROR;}
 
@@ -188,19 +209,20 @@ int handleColon(char* word,int* category,int firstLetter,int line ,int ch){
 }
 
 
-
+/*used by parseCategory, this function analyzes a given char ,
+ * returns 1 if the type of char and its placement corresponds to the rules,
+ * otherwise returns -1*/
 int analyzeChar(int* dot,int ch,int* firstLetter,int line){
 
     int state = VALID;
 
     if (ch == '.') {
 
-        if (validDotStart((*dot), (*firstLetter), line))
+        if (dotValidation((*dot), (*firstLetter), line))
             (*dot) = 1;
         else
             state = ERROR;
     }
-
     else if (isalpha(ch))
         (*firstLetter) = 1;
 
@@ -219,13 +241,16 @@ int analyzeChar(int* dot,int ch,int* firstLetter,int line){
 }
 
 
-/*case we look for directive*/
+/*a dot was found in the beginning of the word, during parseCategory func analyze,
+ * so an exam if a proper directive name is being done in this function
+ * if valid returns 1
+ * otherwise,if invalid returns -1*/
 int handleDirCase(int* category, char* word, int line){
 
     int ans,state = VALID;
 
     if ((*category) == LABEL_FLAG || (*category) == EMPTY_CATEGORY_FLAG) {
-        ans = validDirectiveName(word);
+        ans = validDirName(word);
         if (ans) {
             directiveCategorySelector(category,word);
             state = EXIT;
@@ -243,7 +268,10 @@ int handleDirCase(int* category, char* word, int line){
 }
 
 
-
+/*a function used by parseCategory function, that analyzes if the given arg is a valid instruction / label
+ * based on its position in the line,and based on what came beforehand.
+ * if the arg is valid,returns 1.
+ * otherwise returns -1*/
 int handleLabelOrInstruction(int* category,char* word,int line){
     int ans,state = VALID;
 
@@ -283,16 +311,16 @@ int handleLabelOrInstruction(int* category,char* word,int line){
  * validate and update the data structures based on their traits that were given from first iteration
  * returns 1 everything was updated and found successfully
  * returns -1 if a label wasn't declared or doesn't correspond to the rules*/
-int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,externTablePtr* externTableHead,codeImgPtr* codeHead,entryTablePtr* entryHead){
+int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symHead, externTablePtr* extHead, codeImgPtr* codeHead, entryTablePtr* entHead){
 
     int state = VALID,ans;
 
     labelTablePtr curr = (*labelTablehead);
     for(;curr;curr = getNextLabelNode(curr)){/*iter through label as arg dataStructure*/
-        ans = analyzeTypeSymbol(curr, symbolTableHead, externTableHead, codeHead,entryHead);
+        ans = analyzeTypeSymbol(curr, symHead, extHead, codeHead, entHead);
         if(ans == EXIT)
-            if(findEntryLabel(entryHead, getLabelTableName(curr)))
-                analyzeEntrySymbol(getLabelTableName(curr),entryHead, getLabelTableAddress(curr));
+            if(findEntryLabel(entHead, getLabelTableName(curr)))
+                analyzeEntrySymbol(getLabelTableName(curr), entHead, getLabelTableAddress(curr));
         if(ans == ERROR)
             state = ERROR;
     }
@@ -301,11 +329,11 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,
 }
 
 
-/*the function analyzes a given label from labelTable data structure
+/*the function analyzes a given label from labelTable data structure and matches it to a symbol from the symbolTable
  * returns 1 if the label exists in the symbolTable and corresponds to the rules.
  * if exists but does not correspond to the rules returns -1.
- * otherwise, if doesn't exist returns 0*/
-int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead){
+ * otherwise, if doesn't exist at all returns 0*/
+int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* extHead, codeImgPtr* codeHead, entryTablePtr* entHead){
 
     int state = VALID,found = 0;
     symbolPtr symPtr = (*symbolHead);
@@ -316,7 +344,7 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
             found = 1;
             if(getSymbolType(symPtr) == EXTERN_AT){
                 if(getLabelBranch(labelPtr) == J_BRANCHING){ /*la/call/jmp*/
-                    state = addToExtTable(externHead, getLabelTableName(labelPtr), getLabelTableAddress(labelPtr),
+                    state = addToExtTable(extHead, getLabelTableName(labelPtr), getLabelTableAddress(labelPtr),
                                           getLabelTableLine(labelPtr));
                     if(state == ERROR)
                         ERROR_MEMORY_MAXED_OUT(getLabelTableLine(labelPtr));
@@ -328,10 +356,10 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
                 }
             }
 
-            else{ /*not external*/
+            else{ /*the labels are matched,and the symbol wasn't declared externally */
 
-                if(findEntryLabel(entryHead, getSymbolLabel(symPtr)))
-                    analyzeEntrySymbol(getLabelTableName(labelPtr),entryHead, getSymbolAddress(symPtr));
+                if(findEntryLabel(entHead, getSymbolLabel(symPtr)))
+                    analyzeEntrySymbol(getLabelTableName(labelPtr), entHead, getSymbolAddress(symPtr));
 
                 if(getLabelBranch(labelPtr) == J_BRANCHING)
                     state = updateJbranching(codeHead,getLabelTableName(labelPtr), getSymbolAddress(symPtr));

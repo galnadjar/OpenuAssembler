@@ -29,19 +29,19 @@
 
 int handleLabelOrInstruction(int* category,char* word,int line);
 
-int handleEntOrExtCategory(int* i, char* lineInput, char* labelName, int line, int category, entryTablePtr* entryHead, symbolPtr* symHead);
+int handleEntOrExtCategory(int i, char* lineInput, char* label, int line, int category, entryTablePtr* entryHead, symbolPtr* symHead);
 
 int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved,int* category,int line);
 
-int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symbolTableHead,externTablePtr* externTableHead,codeImgPtr* codeHead,entryTablePtr* entryHead);
+int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symHead, externTablePtr* extHead, codeImgPtr* codeHead, entryTablePtr* entHead);
 
-int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* externHead, codeImgPtr* codeHead,entryTablePtr* entryHead);
+int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTablePtr* extHead, codeImgPtr* codeHead, entryTablePtr* entHead);
 
-int validDirectiveName(char*);
+int validDirName(char*);
 
-int parseCategory(int* i, char* lineInput, char** wordSaved, int* category, int line);
+int parseCategory(int i, char* lineInput, char** wordSaved, int* category, int line);
 
-int validDotStart(int ,int ,int );
+int dotValidation(int , int , int );
 
 void invalidCategoryArgs(int line, int category);
 
