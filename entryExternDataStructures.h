@@ -1,17 +1,19 @@
-//
-// Created by xubuntu on 7/21/21.
-//
 
 #ifndef MAMAN14_ENTRYEXTERNDATASTRUCTURES_H
 #define MAMAN14_ENTRYEXTERNDATASTRUCTURES_H
-#include "stdlib.h"
+
+/*---------------------------- includes ----------------------------*/
+
 #include <string.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include "errorsHeader.h"
 
 
 typedef struct entryTable* entryTablePtr;
 typedef struct externTable* externTablePtr;
+
+
+/*-------------------- functions declarations ---------------------*/
 
 int analyzeEntrySymbol(char* label,entryTablePtr* entryHead,long address);
 

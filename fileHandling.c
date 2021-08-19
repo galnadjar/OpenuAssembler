@@ -2,7 +2,6 @@
 
 /*opens the file ,and check if empty
  * if the file was opened properly and is not empty, calls readFile function to read it*/
-
 void openFile(char* p){
 
     int state = 1;
@@ -162,6 +161,7 @@ void resetIterVars(int* wasLabel, char** wordSaved, char** labelName, int* i, in
     if(*wordSaved)
         free(*wordSaved);
 }
+
 
 /*releases all the data structures in the program*/
 void releaseDataTables(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,labelTablePtr* labelTableHead,

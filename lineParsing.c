@@ -83,7 +83,6 @@ int handleEntOrExtCategory(int i, char* lineInput, char* label, int line, int ca
     int state = VALID;
     i = analyzeLabel(lineInput,i,line,&label);
 
-
     if (i != ERROR) {
         i = locAfterSpace(lineInput, i);
 

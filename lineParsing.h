@@ -1,7 +1,3 @@
-//
-// Created by xubuntu on 7/12/21.
-//
-
 #ifndef MAMAN14_LINEPARSING_H
 #define MAMAN14_LINEPARSING_H
 
@@ -9,7 +5,6 @@
 
 #include "errorsHeader.h"
 #include "symbolTable.h"
-#include "spaceParse.h"
 #include "labelHandling.h"
 #include "entryExternDataStructures.h"
 #include "codeImg.h"

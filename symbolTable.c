@@ -11,7 +11,9 @@ typedef struct symbol{
 }symbol;
 
 
-/*returns 1 if symbol added successfully , otherwise return -1*/
+/*handles the adding of a label to the symbol table,
+ * if the symbol was previously declared extern and now its the second decleration of extern, does nothing and returns 1.
+ * otherwise,was previously declared as anything else / the creation of symbol wasn't possible returns -1,*/
 int addSymbol(symbolPtr* symbolHead, char* label, long address, int category, int line){ /*first node is not assigned*/
 
     int state = VALID;
@@ -54,7 +56,8 @@ void addNodeToSymbolTable(symbolPtr* head,symbolPtr* desired){
 }
 
 
-/*return the node if found otherwise returns null*/
+/*searches in the symbol data structure after a label,
+* return the node if found otherwise returns null*/
 symbolPtr findSymbol(symbolPtr* symbolTableHead, char* word){
 
     symbolPtr match = NULL;
@@ -65,6 +68,8 @@ symbolPtr findSymbol(symbolPtr* symbolTableHead, char* word){
 
     return match;
 }
+
+
 /*if memory allocated properly returns 1 return -1*/
 int createSymbol(symbolPtr* symbolName,char* label,long address,int category,int line){
 

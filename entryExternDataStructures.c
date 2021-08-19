@@ -22,7 +22,9 @@ typedef struct externTable{
 
 
 
-/*if not exist in the table and also memory is available adds an entry node and returns 1,otherwise returns 0*/
+/* adds an entry symbol,
+ * if already exist / doesn't exist yet and handleEntNode returns 1 , the func returns 1
+ * otherwise, if memory is full returns -1*/
 int addEntry(entryTablePtr* entryHead,char* label,int line){
 
     entryTablePtr ptrEnt;
@@ -33,9 +35,8 @@ int addEntry(entryTablePtr* entryHead,char* label,int line){
     if(!ptrEnt) /*if doesn't exist*/
         state = handleEntNode(label,entryHead,line);
 
-    if(state == ERROR){
+    if(state == ERROR)
         ERROR_MEMORY_MAXED_OUT(line);
-        state = 0;}
 
     return state;
 }
@@ -47,7 +48,8 @@ void setEntryAddress(entryTablePtr* ptr ,long address){
 }
 
 
-/*handles the actual adding of the entry node to the table returns 1 if valid allocation of new node, -1 otherwise*/
+/*handles the actual adding of the entry node to the table returns 1 if the allocation of new node is possible,
+ * otherwise, returns -1 */
 int handleEntNode(char* label,entryTablePtr* entryHead,int line){
     int state = VALID;
     entryTablePtr tempEnt,currEnt;
@@ -85,7 +87,7 @@ entryTablePtr findEntryLabel(entryTablePtr* entryTableHead, char* word){
 }
 
 
-/*if the allocation for the new node is valid,adds a new ext node to the ext data table and returns 1,otherwise,-1*/
+/*if the allocation for the new node is valid,adds a new ext node to the extern data table and returns 1,otherwise,-1*/
 int addToExtTable(externTablePtr *tableHead, char* word, long address,int line){
 
     externTablePtr node;

@@ -1,8 +1,7 @@
-//
-// Created by xubuntu on 8/3/21.
-//
 
 #include "handleNumbers.h"
+
+
 int handleNum(long* num, int ch, int line, int* firstDigit,const long minVal,const long maxVal){
     int state = VALID;
 
@@ -18,6 +17,7 @@ int handleNum(long* num, int ch, int line, int* firstDigit,const long minVal,con
 
     return state;
 }
+
 
 /*the function returns the index after the comma/space if the number was set properly,otherwise returns -1*/
 int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,const long minVal,const long maxVal,int* comma){
@@ -65,9 +65,10 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
 
     if(firstDigit && i == strlen(lineInput) -1){/*in a number*/
         state = handleNumSpace(&sum, operator, firstDigit, line);
-        if(state == EXIT)
+        if(state == EXIT){
             (*num) = sum;
-            (*comma) = 0;} /*todo check why yellow*/
+            (*comma) = 0;}
+    }
 
     if(state == ERROR)
         i = ERROR;
@@ -75,16 +76,18 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
     return i;
 }
 
+
+/*check if the given number is 2 byte sized*/
 int checkTwoByteSize(long num){
     return (num >= MIN_TWO_BYTES_SIZE && num <= MAX_TWO_BYTES_SIZE);
 }
-
 
 
 /*check if the number will stay in the num range, returns 1 if so,otherwise returns 0*/
 int checkValidNumRange(int ch, long num,const long minRange,const long maxRange){
     return (num*10) + (ch - '0') >= minRange && (num*10) + (ch - '0') <= maxRange;
 }
+
 
 /*returns 0 if proper space and -1 if improper*/
 int handleNumSpace(long* num, int operator, int firstDigit, int line){
@@ -103,6 +106,8 @@ int handleNumSpace(long* num, int operator, int firstDigit, int line){
     return state;
 }
 
+
+
 int handleNumComma(int operator, long* num, int commaReq, int line, int ch){ /*CHECK*/
     int state = VALID;
 
@@ -118,6 +123,8 @@ int handleNumComma(int operator, long* num, int commaReq, int line, int ch){ /*C
     }
     return state;
 }
+
+
 
 int handleNumOps(int firstDigit, int line, int ch, int* operator){
     int state = VALID;
@@ -141,6 +148,8 @@ int handleNumOps(int firstDigit, int line, int ch, int* operator){
     return state;
 }
 
+
+/*adjust minval and maxval variables based on the given dir*/
 void adjustValues(long* minVal, long* maxVal,int dir){
 
     if(dir == DB_DIR){

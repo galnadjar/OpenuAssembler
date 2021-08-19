@@ -1,6 +1,8 @@
 #include "codeImg.h"
 
 
+/*structure for the code img*/
+
 typedef struct codeImg{
 
     long nodeAddress;
@@ -52,7 +54,8 @@ typedef struct codeImg{
 
 
 
-/*returns 1 if allocated properly, otherwise returns 0*/
+/*a function that adds R-Type code nodes to the Rcmd inner structs of codeImg
+ * returns 1 if allocated properly, otherwise returns 0*/
 int addRCodeNode(int rs,int rt,int rd,long IC,int opcode,int funct, codeImgPtr* imgHead,int line){
 
     int state = VALID;
@@ -84,7 +87,9 @@ int addRCodeNode(int rs,int rt,int rd,long IC,int opcode,int funct, codeImgPtr* 
     return state;
 }
 
-/*returns 1 if allocated properly, otherwise returns 0*/
+
+/*a function that adds J-Type code nodes to the Jcmd inner structs of codeImg
+ * returns 1 if allocated properly, otherwise returns 0*/
 int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,char* label,int line){
 
     int state = 1;
@@ -115,7 +120,9 @@ int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,cha
     return state;
 }
 
-/*returns 1 if allocated properly, otherwise returns 0*/
+
+/*a function that adds I-Type code nodes to the Icmd inner structs of codeImg
+* returns 1 if allocated properly, otherwise returns 0*/
 int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead,char* label,int line){
 
     int state = 1;
@@ -202,10 +209,10 @@ int updateJbranching(codeImgPtr* codeHead,char* label, long address){
         state = 1;
 
     return state;
-
 }
 
 
+/*gets the code display of the current code node*/
 int getCodeDisplay(codeImgPtr ptr ,byteSelect byte){
 
     int byteSelected;
@@ -231,14 +238,20 @@ int getCodeDisplay(codeImgPtr ptr ,byteSelect byte){
     return byteSelected;
 }
 
+
+/*gets the current node of codeImg address*/
 long getCodeAddress(codeImgPtr ptr){
     return ptr->nodeAddress;
 }
 
+
+/*gets the next node to the given node of codeImg*/
 codeImgPtr getNextCodeNode(codeImgPtr ptr){
     return ptr->next;
 }
 
+
+/*gets the current codeImg node line*/
 int getCodeLine(codeImgPtr ptr){
     return ptr->line;
 }

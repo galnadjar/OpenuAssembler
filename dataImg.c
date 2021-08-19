@@ -4,6 +4,7 @@
 
 #include "dataImg.h"
 
+/*data img structure*/
 
 typedef struct dataImg{
 
@@ -36,7 +37,8 @@ typedef struct dataImg{
     }data;
 }dataImg;
 
-/*adds directive nodes,returns 1 if memory allocated properly,and -1 otherwise*/
+/*adds directive nodes to the Data structure,
+ * returns 1 if memory allocated properly,and -1 otherwise*/
 int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC,int line,int counter){
 
     int i,state = VALID;
@@ -81,29 +83,8 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
     return state;
 }
 
-/*allocate memory to a node and if the allocation was successful,copy a dataNode values and returns 1,otherwise,return -1*/
-int copyDataNodeVals(dataImgPtr* dest, dataImgPtr src){
 
-    int state = VALID;
-
-        (*dest) = calloc(1,sizeof(dataImg));
-        if(*dest){
-            (*dest)->address = src->address;
-            (*dest)->type = src->type;
-            (*dest)->line = src->line;
-            (*dest)->data.display.d1 = src->data.display.d1;
-            (*dest)->data.display.d2 = src->data.display.d2;
-            (*dest)->data.display.d3 = src->data.display.d3;
-            (*dest)->data.display.d4 = src->data.display.d4;
-        }
-        else
-            state = ERROR;
-
-    return state;
-}
-
-
-/*prints the data img to the file based on the type of each node given*/
+/*prints the data img to the given file based on the type of each node given*/
 void printDataDisplay(FILE* fp,dataImgPtr ptr,int* bytesCounter,long* DC,long const DCF){
 
     switch (ptr->type) {
@@ -176,6 +157,7 @@ void fillImgData(int dir,dataImgPtr* curr,const char* word,const long* numLst,in
     }
 }
 
+
 /*a getter for a data address of the current data node*/
 long getDataAddress(dataImgPtr ptr){
     return ptr->address;
@@ -191,11 +173,11 @@ dataImgPtr getNextDataNode(dataImgPtr ptr){
     return ptr->next;
 }
 
+
 /*a function which:
  * prints new line if reached to 4 bytes in a row.
  * if the new DC is lower than DCF also prints the new address.
  * otherwise, prints a tab*/
-
 void newLineOrTab(FILE* fp,const int bytesCounter,long* DC,const long DCF){
 
     if(bytesCounter % BYTES_LINE_LEN == 0){
