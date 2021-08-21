@@ -1,6 +1,6 @@
 
-#ifndef MAMAN14_ENTRYEXTERNDATASTRUCTURES_H
-#define MAMAN14_ENTRYEXTERNDATASTRUCTURES_H
+#ifndef MAMAN14_HANDLEENTEXT_H
+#define MAMAN14_HANDLEENTEXT_H
 
 /*---------------------------- includes ----------------------------*/
 
@@ -39,4 +39,4 @@ entryTablePtr getNextEntNode(entryTablePtr ptr);
 
 void setEntryAddress(entryTablePtr* ptr,long address);
 
-#endif //MAMAN14_ENTRYEXTERNDATASTRUCTURES_H
+#endif //MAMAN14_HANDLEENTEXT_H

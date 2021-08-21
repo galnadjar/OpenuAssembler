@@ -5,8 +5,8 @@
 
 #include "errorsHeader.h"
 #include "symbolTable.h"
-#include "labelHandling.h"
-#include "entryExternDataStructures.h"
+#include "labelAnalyze.h"
+#include "handleEntExt.h"
 #include "codeImg.h"
 
 
@@ -49,6 +49,5 @@ int handleColon(char* word,int* category,int firstLetter,int line,int ch);
 int analyzeChar(int* dot,int ch,int* firstLetter,int line);
 
 int handleDirCase(int* category, char* word, int line);
-
 
 #endif //MAMAN14_LINEPARSING_H

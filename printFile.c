@@ -56,7 +56,7 @@ void printCodeImg(FILE* fp,codeImgPtr codePtr){
 }
 
 
-/*prints the IC AND DC COUNTERS*/
+/*prints the IC and DC counters to the file*/
 void printCounters(FILE* fp ,long IC, long DC){
     fprintf(fp,"\t\t%ld\t%ld\n",IC-IC_INITIAL_ADDRESS,DC-IC);
 }

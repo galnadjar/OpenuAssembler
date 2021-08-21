@@ -1,4 +1,4 @@
-#include "entryExternDataStructures.h"
+#include "handleEntExt.h"
 
 /*data structures for entry and extern symbols*/
 

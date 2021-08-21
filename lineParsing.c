@@ -314,8 +314,7 @@ int handleLabelOrInstruction(int* category,char* word,int line){
 }
 
 
-/*if the external and entry were exists update them and return 1,otherwise -1
- * the function analyzes each label that was passed as an argument and calls analyzeTypeSymbol to:
+/* the function analyzes each label that was passed as an argument and calls analyzeTypeSymbol to:
  * validate and update the data structures based on their traits that were given from first iteration
  * returns 1 everything was updated and found successfully
  * returns -1 if a label wasn't declared or doesn't correspond to the rules*/
@@ -385,3 +384,4 @@ int analyzeTypeSymbol(labelTablePtr labelPtr, symbolPtr* symbolHead, externTable
 
     return state;
 }
+

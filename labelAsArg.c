@@ -17,7 +17,8 @@ labelTablePtr getNextLabelNode(labelTablePtr ptr){
     return ptr->next;
 }
 
-
+/*adds a new label that was given as an argument to the label table if memory is available and returns 1,
+ * otherwise returns -1*/
 int addToLabelTable(labelTablePtr *head, char* labelName, long address,type branch,int line){
     int state = VALID;
 
@@ -45,25 +46,25 @@ int addToLabelTable(labelTablePtr *head, char* labelName, long address,type bran
 }
 
 
-/*returns the type of the node*/
+/*returns the type of the labelTable node*/
 int getLabelBranch(labelTablePtr ptr){
     return ptr->branch;
 }
 
 
-/*returns the line of the node*/
+/*returns the line of the labelTable node*/
 int getLabelTableLine(labelTablePtr ptr){
     return ptr->line;
 }
 
 
-/*returns the address of the node*/
+/*returns the address of the labelTable node*/
 long getLabelTableAddress(labelTablePtr ptr){
     return ptr->address;
 }
 
 
-/*returns the label of the node*/
+/*returns the name of the labelTable node*/
 char* getLabelTableName(labelTablePtr ptr){
     return ptr->labelName;
 }

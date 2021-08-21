@@ -1,11 +1,13 @@
 #ifndef MAMAN14_SPACEPARSE_H
 #define MAMAN14_SPACEPARSE_H
 
-#include <stdio.h>
+/*---------------------------- includes ----------------------------*/
 #include <string.h>
 #include <ctype.h>
 #include "errorsHeader.h"
 
+
+/*-------------------- functions declarations ---------------------*/
 int isEmptyLine(char* );
 int locAfterSpace(char*,int);
 int commaAfterSpace(char* lineInput, int i);

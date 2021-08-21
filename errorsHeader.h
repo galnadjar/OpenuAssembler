@@ -60,6 +60,9 @@
 
 #define ERROR_EXTRANEOUS_END_OF_CMD(X) printf("ERROR: In line %d,extraneous text after end of command was found\n",X)
 
+#define COMMA_WITHOUT_DATA(X) printf("ERROR: In line %d,a comma was given without a data prior to it\n",X)
+
+
 #define ERROR_LABEL_WITHOUT_SPACE(X) printf("ERROR: In line %d,a line that started with label didn't have space after\n",X)
 
 #define ERROR_EMPTY_INSTRUCTION(X) printf("ERROR: In line %d,instruction received no arguments while needed\n",X)

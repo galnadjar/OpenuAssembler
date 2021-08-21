@@ -1,6 +1,6 @@
 #include "spaceParse.h"
 
-/*return 1 if emptyLine and 0 if not empty*/
+/*return 1 if is an emptyLine and 0 if not empty*/
 int isEmptyLine(char* lineInput){
 
     int ch;
@@ -26,7 +26,7 @@ int isEmptyLine(char* lineInput){
     return !state;
 }
 
-/*returns the index of the first letter encountered / end of line*/
+/*iterating through the line , returning the index of the first letter encountered / end of line*/
 int locAfterSpace(char* lineInput,int i){
     int state = VALID,ch;
 
@@ -41,7 +41,8 @@ int locAfterSpace(char* lineInput,int i){
     return i;
 }
 
-/*returns the first index of ',' if found,otherwise if another char returns 0 ,if no comma found until end of line returns -1 */
+/*iterating through the line , returning the first index of ',' if found,otherwise if another char returns 0 ,
+ * if no comma found until end of line returns -1 */
 int commaAfterSpace(char* lineInput, int i){
 
     int state = VALID;

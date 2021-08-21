@@ -3,7 +3,7 @@
 
 /*---------------------------- includes ----------------------------*/
 
-#include "entryExternDataStructures.h"
+#include "handleEntExt.h"
 #include "codeImg.h"
 #include "dataImg.h"
 

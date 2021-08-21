@@ -55,7 +55,7 @@ typedef struct codeImg{
 
 
 /*a function that adds R-Type code nodes to the Rcmd inner structs of codeImg
- * returns 1 if allocated properly, otherwise returns 0*/
+ * returns 1 if allocated properly, otherwise returns -1*/
 int addRCodeNode(int rs,int rt,int rd,long IC,int opcode,int funct, codeImgPtr* imgHead,int line){
 
     int state = VALID;
@@ -82,14 +82,14 @@ int addRCodeNode(int rs,int rt,int rd,long IC,int opcode,int funct, codeImgPtr* 
             *imgHead = temp;
     }
     else
-        state = 0;
+        state = ERROR;
 
     return state;
 }
 
 
 /*a function that adds J-Type code nodes to the Jcmd inner structs of codeImg
- * returns 1 if allocated properly, otherwise returns 0*/
+ * returns 1 if allocated properly, otherwise returns -1*/
 int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,char* label,int line){
 
     int state = 1;
@@ -115,7 +115,7 @@ int addJCodeNode(int reg,long IC,long address,int opcode,codeImgPtr* imgHead,cha
             *imgHead = temp;
     }
     else
-        state = 0;
+        state = ERROR;
 
     return state;
 }
@@ -153,7 +153,7 @@ int addICodeNode(int rs,int rt,long immed,long IC,int opcode,codeImgPtr* imgHead
             *imgHead = temp;
     }
     else
-        state = 0;
+        state = ERROR;
 
     return state;
 }
