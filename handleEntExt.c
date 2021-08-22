@@ -166,3 +166,22 @@ externTablePtr getNextExtNode(externTablePtr ptr){
 entryTablePtr getNextEntNode(entryTablePtr ptr){
     return ptr->next;
 }
+
+
+int checkNotEmptyEnt(entryTablePtr ptr){
+    int found = 0;
+    for(;ptr;ptr = ptr->next){
+        if(ptr->address)
+            found = 1;
+    }
+    return found;
+}
+
+int checkNotEmptyExt(externTablePtr ptr){
+    int found = 0;
+    for(;ptr;ptr = ptr->next){
+        if(ptr->address)
+            found = 1;
+    }
+    return found;
+}

@@ -13,7 +13,7 @@
 #define MAX_ONE_BYTE_SIZE (127)
 #define MIN_TWO_BYTES_SIZE (-32768)
 #define MAX_TWO_BYTES_SIZE 32767
-#define MIN_FOUR_BYTES_SIZE (-2147483647)
+#define MIN_FOUR_BYTES_SIZE ((-2147483647)-1)
 #define MAX_FOUR_BYTES_SIZE 2147483647
 
 typedef enum{
@@ -27,11 +27,11 @@ typedef enum{
 
 /*-------------------- functions declarations ---------------------*/
 
-int handleDigit(long* num, int ch, int line, int* firstDigit, long minVal, long maxVal);
+int handleDigit(long* num, int ch, int line, int* firstDigit,int operator, long minVal, long maxVal);
 
 int checkTwoByteSize(long num);
 
-int checkValidNumRange(int ch, long num, long minRange, long maxRange);
+int checkValidNumRange(int ch,int mult, long num, long minRange, long maxRange);
 
 int handleNumSpace(long* num, int operator, int firstDigit, int line);
 
@@ -43,4 +43,4 @@ void adjustValues(long* minVal, long* maxVal,int dir);
 
 int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq, long minVal, long maxVal,int* comma);
 
-#endif //MAMAN14_HANDLENUMBERS_H
+#endif /*MAMAN14_HANDLENUMBERS_H*/

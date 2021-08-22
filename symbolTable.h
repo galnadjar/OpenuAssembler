@@ -39,4 +39,4 @@ symbolPtr getSymbolNextNode(symbolPtr ptr);
 
 void setSymbolValues(symbolPtr* ptr,char* label,long address,int category,int line);
 
-#endif //MAMAN14_SYMBOLTABLE_H
+#endif /*MAMAN14_SYMBOLTABLE_H*/

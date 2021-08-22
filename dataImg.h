@@ -36,4 +36,4 @@ dataImgPtr getNextDataNode(dataImgPtr ptr);
 
 void newLineOrTab(FILE* fp,int bytesCounter,long* DC,long DCF);
 
-#endif //MAMAN14_DATAIMG_H
+#endif /*MAMAN14_DATAIMG_H*/

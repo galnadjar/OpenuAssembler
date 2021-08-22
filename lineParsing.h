@@ -44,10 +44,10 @@ void labelNameError(int line,char* word);
 
 void directiveCategorySelector(int* category,char* word);
 
-int handleColon(char* word,int* category,int firstLetter,int line,int ch);
+int handleColon(char* word,int* category,int firstLetter,int line,int ch,int dot,int* i);
 
 int analyzeChar(int* dot,int ch,int* firstLetter,int line);
 
 int handleDirCase(int* category, char* word, int line);
 
-#endif //MAMAN14_LINEPARSING_H
+#endif /*MAMAN14_LINEPARSING_H*/

@@ -14,11 +14,7 @@ int parseCategory(int i, char* lineInput, char** wordSaved, int* category, int l
         for (; i < strlen(lineInput) -1 && state == VALID;i++) {
             ch = (int)lineInput[i];
 
-            /*check if the current char is ':' and that we look for a label*/
-            if (ch == ':'){
-                    state = handleColon(word,category,firstLetter,line,ch);}
-
-            else if (isspace(ch)) {
+            if (isspace(ch)) {
 
                 if (!firstLetter && !dot) /*means its space before anything so we jump to the first letter*/
                     i = locAfterSpace(lineInput, i) - 1;
@@ -27,14 +23,31 @@ int parseCategory(int i, char* lineInput, char** wordSaved, int* category, int l
                     state = handleDirCase(category, word, line);
 
                 else  /*a word without a dot, should be a label or instruction*/
-                state = handleLabelOrInstruction(category,word,line);
+                    state = handleLabelOrInstruction(category,word,line);
 
             } /*end of isspace*/
+
+            /*check if the current char is ':' and that we look for a label*/
+            else if (ch == ':'){
+                state = handleColon(word,category,firstLetter,line,ch,dot,&i);}
 
             else {
                 state = analyzeChar(&dot,ch,&firstLetter,line);
 
-                if(state != ERROR)
+                if(state == ERROR){ /*problematic letter was found*/
+                    if(dot > 0)
+                        ERROR_IMPROPER_DIRECTIVE_NAME(line);
+//                        state = handleDirCase(category, word, line);
+
+                    else if(firstLetter)
+                        ERROR_IMPROPER_INSTRUCTION_NAME(line);
+//                        state = handleLabelOrInstruction(category,word,line);
+
+                    else
+                        ERROR_INVALID_CHAR(line,ch);
+                }
+
+                else
                     word[wordloc++] = (char) ch;
             }/*end of else*/
         } /*end of for loop*/
@@ -43,6 +56,12 @@ int parseCategory(int i, char* lineInput, char** wordSaved, int* category, int l
 
             if (dot > 0)  /*a dot was passed in already,so we check if it's a start of directive name*/
                 state = handleDirCase(category, word, line);
+
+
+            else if((lineInput[i] == '\n' || lineInput[i] == 0) && !firstLetter){
+                state = ERROR;
+                ERROR_EMPTY_LABEL(line);
+            }
 
             else  /*a word without a dot, should be a label or instruction*/
                 state = handleLabelOrInstruction(category,word,line);
@@ -65,12 +84,14 @@ int handleLabelCategory(int* i,char* lineInput,char** labelName,char** wordSaved
 
     if(isspace(lineInput[(*i)])) { /*check that after the ':' theres a spacing*/
         strcpy(*labelName,*wordSaved);
-        (*i) = parseCategory(*i, lineInput, wordSaved, category, line);}
+        (*i) = parseCategory(*i, lineInput, wordSaved, category, line);
+    }
 
     else{
         (*i) = 0;
         state = ERROR;
         ERROR_LABEL_WITHOUT_SPACE(line);}
+
     return state;
 }
 
@@ -193,10 +214,15 @@ void directiveCategorySelector(int* category,char* word){
 /*used by parseCategory, this function analyzes a given label(since ended with a colon).
  * returns 0 if a valid label and matches in its placement
  * returns -1 if either the label is invalid or the colon position is */
-int handleColon(char* word,int* category,int firstLetter,int line ,int ch){
+int handleColon(char* word,int* category,int firstLetter,int line ,int ch,int dot,int* i){
     int ans,state = VALID;
 
-    if ((*category) == EMPTY_CATEGORY_FLAG && firstLetter) { /*it's the first word, and a letter was given*/
+    if (dot > 0){  /*a dot was passed in already,so we check if it's a start of directive name*/
+        state = handleDirCase(category, word, line); /*retuns 0 or error*/
+        if(!state)
+            (*i)--;}
+
+    else if ((*category) == EMPTY_CATEGORY_FLAG && firstLetter) { /*it's the first word, and a letter was given*/
         ans = validLabelORInstruction(word, LABEL_SEARCH);/*check if the given label is valid*/
 
         if (ans && strlen(word) <= MAX_LABEL_LENGTH) {
@@ -236,15 +262,13 @@ int analyzeChar(int* dot,int ch,int* firstLetter,int line){
 
     else if (isdigit(ch)) {
 
-        if (!firstLetter) { /*a digit is given before a letter which is invalid*/
-            ERROR_INVALID_PLACEMENT_OF_DIGIT(line);
-            state = ERROR;}
+        if (!(*firstLetter))  /*a digit is given before a letter which is invalid*/
+            state = ERROR;
     }
 
-    else { /*an invalid character was given*/
-        ERROR_INVALID_CHAR(line,ch);
+    else  /*an invalid character was given*/
         state = ERROR;
-    }
+
     return state;
 }
 
@@ -325,9 +349,13 @@ int analyzeLabelTable(labelTablePtr* labelTablehead, symbolPtr* symHead, externT
     labelTablePtr curr = (*labelTablehead);
     for(;curr;curr = getNextLabelNode(curr)){/*iter through label as arg dataStructure*/
         ans = analyzeTypeSymbol(curr, symHead, extHead, codeHead, entHead);
-        if(ans == EXIT)
+        if(ans == EXIT){
             if(findEntryLabel(entHead, getLabelTableName(curr)))
                 analyzeEntrySymbol(getLabelTableName(curr), entHead, getLabelTableAddress(curr));
+            else{
+                ERROR_UNUSED_LABEL(getLabelTableLine(curr));
+                ans = ERROR;}
+        }
         if(ans == ERROR)
             state = ERROR;
     }

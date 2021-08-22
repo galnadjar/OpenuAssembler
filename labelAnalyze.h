@@ -24,4 +24,4 @@ int validLabelORInstruction(char* input, int request);
 int analyzeLabel(char* lineInput, int i, int line, char** label);
 
 
-#endif //MAMAN14_LABELANALYZE_H
+#endif /*MAMAN14_LABELANALYZE_H*/

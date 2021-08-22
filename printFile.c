@@ -4,7 +4,7 @@
 FILE* createWriteFile(char* name,char* extension){
 
     FILE* fp = NULL;
-    char fileName[strlen(name) + strlen(extension)+1];
+    char* fileName = (char*) calloc(strlen(name) + strlen(extension)+1,sizeof(char));
     strcpy(fileName, name);
     strcat(fileName, extension);
 
@@ -26,6 +26,7 @@ void writeOB(char* name,dataImgPtr dataPtr,codeImgPtr codePtr,const long DCF,con
         printCounters(fp,ICF,DCF);
         if(codePtr)
             printCodeImg(fp,codePtr);
+
         if(dataPtr)
             printDataImg(fp,dataPtr,ICF,DCF);
     }
@@ -104,7 +105,7 @@ void printExt(FILE* fp,externTablePtr externPtr){
 
     externTablePtr curr = externPtr;
     while(curr){
-        fprintf(fp,"%04ld\t%s\n",getExtAddress(curr), getExternLabel(curr));
+        fprintf(fp,"%s\t%04ld\n",getExternLabel(curr),getExtAddress(curr));
         curr = getNextExtNode(curr);
     }
 }

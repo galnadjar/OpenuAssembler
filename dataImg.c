@@ -1,7 +1,3 @@
-//
-// Created by xubuntu on 7/22/21.
-//
-
 #include "dataImg.h"
 
 /*data img structure*/
@@ -46,7 +42,7 @@ int addDirNodes(dataImgPtr* imgHead, char* word, long* numLst, int dir, long* DC
 
     if((*DC) != DC_INITIAL){
         curr = *imgHead;
-        for(;curr->next;curr = getNextDataNode(curr)); /*gets the pointer to the end the data list*/
+        for(;curr->next;curr = getNextDataNode(curr)); /*gets the pointer to the end of the data list*/
         curr->next = (dataImgPtr) calloc(1,sizeof(dataImg));
         curr = getNextDataNode(curr);}
 

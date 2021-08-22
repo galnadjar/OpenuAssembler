@@ -47,7 +47,7 @@ int analyzeLabel(char* lineInput, int i, int line, char** label){
     }
 
     if(i == strlen(lineInput)-1 && !wordStarted){
-        ERROR_LABEL_NAME(line);
+        ERROR_MISSING_LABEL(line);
         state = ERROR;}
 
     if(state == ERROR)
@@ -69,12 +69,14 @@ int validLabelORInstruction(char* input, int request) {/*returns 1 if not found 
     int bot = 0,top,mid;
     int loc;
 
-    char* savedWords[] = {"add", "and", "andi", "asciz", "beq", "bgt", "blt", "bne", "call", "db", "dh", "dw", "entry",
-                          "extern", "jmp", "la", "lb", "lh", "lw", "move", "mvhi", "mvlo", "nor", "nori",
-                          "or", "ori", "sb", "sh", "stop", "sub", "subi", "sw"};
+    char* savedWords[] = {"add","addi","and","andi","asciz","beq","bgt","blt","bne","call","db","dh","dw","entry",
+                          "extern","jmp","la","lb","lh","lw","move","mvhi","mvlo","nor","nori","or","ori","sb","sh",
+                          "stop","sub","subi","sw"};
 
-    char* instructionWords[] = {"add", "and", "andi", "beq", "bgt", "blt", "bne", "call", "jmp", "la", "lb", "lh", "lw", "move",
-                                "mvhi", "mvlo", "nor", "nori", "or", "ori", "sb", "sh", "stop", "sub", "subi", "sw"};
+
+    char* instructionWords[] = {"add","addi","and","andi","beq","bgt","blt","bne","call",
+                                "jmp","la","lb","lh","lw","move","mvhi","mvlo","nor","nori","or",
+                                "ori","sb","sh","stop","sub","subi","sw"};
 
     if(!request)
         top = SAVED_WORDS_LENGTH;

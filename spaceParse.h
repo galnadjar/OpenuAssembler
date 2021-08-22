@@ -13,4 +13,4 @@ int locAfterSpace(char*,int);
 int commaAfterSpace(char* lineInput, int i);
 int findQuotation(char* lineInput, int i, int line);
 
-#endif //MAMAN14_SPACEPARSE_H
+#endif /*MAMAN14_SPACEPARSE_H*/

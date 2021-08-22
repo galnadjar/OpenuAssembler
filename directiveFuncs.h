@@ -21,4 +21,4 @@ int analAsciz(int i,char* lineInput, int line,char** word);
 
 int checkLastNum(char* lineInput,int i,int line,int comma);
 
-#endif //MAMAN14_DIRECTIVEFUNCS_H
+#endif /*MAMAN14_DIRECTIVEFUNCS_H*/

@@ -33,10 +33,14 @@ long getExtAddress(externTablePtr externPtr);
 
 long getEntAddress(entryTablePtr ptr);
 
+int checkNotEmptyEnt(entryTablePtr ptr);
+
+int checkNotEmptyExt(externTablePtr ptr);
+
 externTablePtr getNextExtNode(externTablePtr ptr);
 
 entryTablePtr getNextEntNode(entryTablePtr ptr);
 
 void setEntryAddress(entryTablePtr* ptr,long address);
 
-#endif //MAMAN14_HANDLEENTEXT_H
+#endif /*MAMAN14_HANDLEENTEXT_H*/

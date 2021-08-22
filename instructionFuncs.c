@@ -1,7 +1,3 @@
-//
-// Created by xubuntu on 7/21/21.
-//
-
 #include "instructionFuncs.h"
 
 /*gets the opcode of a given instruction name*/
@@ -223,7 +219,7 @@ int setIcmdWithLabel(char* lineInput,int i,int line,int* rs,int* rt,char** label
                 i = commaAfterSpace(lineInput, i);
                 if (i > 0) {
                     i = analyzeLabel(lineInput,i,line,label);
-                    if (i) {
+                    if (i > 0) {
                         i = locAfterSpace(lineInput, i);
                         if (i != strlen(lineInput) - 1){
                             ERROR_EXTRANEOUS_END_OF_CMD(line);
@@ -311,8 +307,11 @@ int setRcmdReg(char* lineInput,int i,int line,int* rs,int* rt,int* rd,int opcode
 
             if(opcode == logic_arit){
                 i = checkAndSetReg(lineInput, i, line, rt,1);
-                if (i != ERROR) /*check if a proper reg*/
+                if (i != ERROR){ /*check if a proper reg*/
                     i = commaAfterSpace(lineInput, i);
+                    if(i == ERROR)
+                        ERROR_MISSING_COMMA(line);
+                }
             }
 
             else /*case it copy instructions*/
@@ -483,14 +482,39 @@ int checkAndSetReg(char* lineInput, int i, int line,int* reg,int commaReq){
             state = ERROR;}
     }
 
-    if(state == VALID && i == strlen(lineInput)-1 && digit)
-        state = handleRegSpace(digit,reg,regNum,line);
+    if(state == VALID && i == strlen(lineInput)-1)
+        state = checkRegEndCases(digit, reg, regNum, line, regSign);
+
 
     if(state == ERROR)
         i = ERROR;
 
     return i;
 }
+
+
+/*handles the end cases of analyzing registry
+ * return 1 if valid and -1 if invalid*/
+int checkRegEndCases(int digit,int* reg,int regNum,int line,int regSign){
+    int state = VALID;
+
+    if(digit)
+        state = handleRegSpace(digit,reg,regNum,line);
+
+    else{
+        if(regSign)
+            ERROR_INVALID_REG_NAME(line);
+
+        else
+            ERROR_MISSING_REG(line);
+
+        state = ERROR;}
+
+    return state;
+}
+
+
+
 
 
 /*handles the case of spacing while reading registry num , after a reg sign was already given

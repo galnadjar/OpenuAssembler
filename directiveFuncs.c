@@ -73,11 +73,11 @@ int analAsciz(int i, char* lineInput, int line, char** word){
         for(;i < strlen(lineInput) -1 && state;i++){
             ch = (int)lineInput[i];
 
-            if(ch == '"')
-                state = EXIT;
+            if(ch == '"' && lineInput[i-1] != '\\'){
+                    state = EXIT;}
 
             else{
-                if(isprint(ch))
+                if(isprint(ch) || isspace(ch))
                     (*word)[wordInd++] = (char)ch;
                 else{
                     state = ERROR;
@@ -85,8 +85,8 @@ int analAsciz(int i, char* lineInput, int line, char** word){
             }
         }
 
-        if(i == strlen(lineInput) -1 && state == VALID){ /*reached the end without finding closing quotation mark */
-            ERROR_MISSING_QUOTATION(line);
+        if(i == strlen(lineInput) -1 && state == VALID){ /*no closing quotation marks */
+            ERROR_MISSING_CL_QUOTATION(line);
             state = ERROR;}
 
         else if(locAfterSpace(lineInput,i) != strlen(lineInput)-1){
@@ -138,6 +138,10 @@ int analNumLst(int i, char* lineInput, int line, long** numLst, int dir,int* num
             else
                 state = ERROR;
         }
+        if(i == strlen(lineInput) -1 && numInd == 0){
+            ERROR_MISSING_DIRECTIVE_ARG(line);
+            state = ERROR;}
+
         if(state == EXIT)
             state = VALID;
     }

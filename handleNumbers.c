@@ -4,10 +4,15 @@
 /*this function receives a num and a digit and calls for a check if the add is valid ,
  *if valid , applies the add and turn the firstdigit flag on and return 1,
  * otherwise return -1*/
-int handleDigit(long* num, int ch, int line, int* firstDigit, const long minVal, const long maxVal){
-    int state = VALID;
+int handleDigit(long* num, int ch, int line, int* firstDigit,int operator, const long minVal, const long maxVal){
+    int state = VALID,mult;
 
-    state = checkValidNumRange(ch, *num,minVal,maxVal);
+    if(operator == MINUS_OP)
+        mult = -1;
+    else
+        mult = 1;
+
+    state = checkValidNumRange(ch,mult, *num,minVal,maxVal);
 
     if(!state){
         state = ERROR;
@@ -28,15 +33,15 @@ int checkTwoByteSize(long num){
 
 
 /*check if the number will stay in the num range after the add , returns 1 if so,otherwise returns 0*/
-int checkValidNumRange(int ch, long num,const long minRange,const long maxRange){
-    return (num*10) + (ch - '0') >= minRange && (num*10) + (ch - '0') <= maxRange;
+int checkValidNumRange(int ch,int mult, long num,const long minRange,const long maxRange){
+    return mult*((num*10) + (ch - '0')) >= minRange && mult*((num*10) + (ch - '0')) <= maxRange;
 }
 
 
 /*this function handle a given space while analyzing a number,
  * returns 1 if proper space and -1 if improper*/
 int handleNumSpace(long* num, int operator, int firstDigit, int line){
-    int state = VALID;
+    int state = EXIT;
 
     if(!firstDigit){ /*there was an operator sign,and then space without any digit*/
         ERROR_OP_WITHOUT_DIGIT(line);
@@ -157,7 +162,7 @@ int checkAndSetNum(char* lineInput, int i, int line, long* num, int commaReq,con
 
 
         else if(isdigit(ch))
-            state = handleDigit(&sum, ch, line, &firstDigit, minVal, maxVal);
+            state = handleDigit(&sum, ch, line, &firstDigit,operator, minVal, maxVal);
 
         else{
             state = ERROR;

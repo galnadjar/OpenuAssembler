@@ -45,4 +45,4 @@ void freeLabelSt(labelTablePtr* ptr);
 void freeCodeSt(codeImgPtr* ptr);
 
 void freeDataSt(dataImgPtr* ptr);
-#endif //MAMAN14_FILEHANDLING_H
+#endif /*MAMAN14_FILEHANDLING_H*/

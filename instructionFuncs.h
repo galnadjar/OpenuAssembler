@@ -58,4 +58,7 @@ int handleRegComma(int* reg,int regNum,int line,int ch,int digit,int regSign, in
 
 int checkFirstLetter(char* lineInput,int* i);
 
-#endif //MAMAN14_INSTRUCTIONFUNCS_H
+int checkRegEndCases(int digit,int* reg,int regNum,int line,int regSign);
+
+
+#endif /*MAMAN14_INSTRUCTIONFUNCS_H*/

@@ -1,7 +1,3 @@
-//
-// Created by xubuntu on 8/5/21.
-//
-
 #ifndef MAMAN14_LABELASARG_H
 #define MAMAN14_LABELASARG_H
 
@@ -34,4 +30,4 @@ labelTablePtr getNextLabelNode(labelTablePtr ptr);
 
 char* getLabelTableName(labelTablePtr ptr);
 
-#endif //MAMAN14_LABELASARG_H
+#endif /*MAMAN14_LABELASARG_H*/

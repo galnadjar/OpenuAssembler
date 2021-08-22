@@ -32,4 +32,4 @@ void printCodeImg(FILE* fp,codeImgPtr codePtr);
 
 void printCounters(FILE* fp ,long IC, long DC);
 
-#endif //MAMAN14_PRINTFILE_H
+#endif /*MAMAN14_PRINTFILE_H*/

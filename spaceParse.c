@@ -1,6 +1,6 @@
 #include "spaceParse.h"
 
-/*return 1 if is an emptyLine and 0 if not empty*/
+/*this function check if an empty line or not, return 1 if is an empty line and 0 if not empty*/
 int isEmptyLine(char* lineInput){
 
     int ch;
@@ -9,7 +9,8 @@ int isEmptyLine(char* lineInput){
 
     while(state == VALID && i < strlen(lineInput)-1){
         ch = (int)lineInput[i];
-        if(!countCh && ch == ';') /*if its the first actual letter and its ; it means its a comment line*/
+
+        if(ch == ';')
             state = EXIT;
 
         else if(isspace(ch))
@@ -17,9 +18,11 @@ int isEmptyLine(char* lineInput){
 
         else{ /*found something that isn't a white spacing / ';' char*/
             state = ERROR;
-            countCh++;
         }
     }
+    if(state == ERROR) /*not empty*/
+        state = VALID;
+
     if(i == strlen(lineInput)-1 && state == VALID)
         state = EXIT;
 
@@ -85,7 +88,7 @@ int findQuotation(char* lineInput, int i, int line){
             state = ERROR;
     }
     if(i == strlen(lineInput) -1 || state == ERROR){
-        ERROR_MISSING_QUOTATION(line);
+        ERROR_MISSING_OP_QUOTATION(line);
         i = 0;}
 
     return i;

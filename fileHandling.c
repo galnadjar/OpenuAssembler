@@ -34,7 +34,7 @@ void readFile(FILE* fp,char* fileName) {
 
     int i = 0,line = 1, state = VALID,wasError = 0,wasLabel = 0,category = EMPTY_CATEGORY_FLAG,exceedLine;
     long IC = IC_INITIAL_ADDRESS, DC = DC_INITIAL_ADDRESS;
-    char *wordSaved = NULL,*labelName = NULL,*lineInput = (char *) calloc(MAX_ROW_LENGTH, sizeof(char));
+    char *wordSaved = NULL,*labelName = NULL,*lineInput = (char *) calloc(MAX_ROW_LENGTH+1, sizeof(char));
 
     externTablePtr  extHead = NULL;
     symbolPtr symHead = NULL;
@@ -45,7 +45,7 @@ void readFile(FILE* fp,char* fileName) {
 
     while (1) {
 
-        fgets(lineInput, MAX_ROW_LENGTH-1, fp);
+        fgets(lineInput, MAX_ROW_LENGTH, fp);
         if (feof(fp))
             break;
 
@@ -80,6 +80,8 @@ void readFile(FILE* fp,char* fileName) {
                         IC += 4;
                     }
                 }
+                else
+                    state = ERROR;
             }
             else
                 state = ERROR;
@@ -120,11 +122,13 @@ void secondIteration(symbolPtr* symbolTableHead,entryTablePtr* entryTableHead,la
     if(state != ERROR){
         name[strlen(name)-EXT_LENGTH] = '\0';
 
-        writeOB(name, *dataImgHead,*codeImgHead,DCF,ICF);
-        if(*entryTableHead) /*check if head is not empty*/
+        if((*codeImgHead) || (*dataImgHead))
+            writeOB(name, *dataImgHead,*codeImgHead,DCF,ICF);
+
+        if(checkNotEmptyEnt(*entryTableHead)) /*check if head is not empty*/
             writeEntry(name,*entryTableHead);
 
-        if(*externHead)/*check if head is not empty*/
+        if(checkNotEmptyExt(*externHead))/*check if head is not empty*/
             writeExtern(name,*externHead);
 
         printf("file given was valid, output files were created accordingly.\n");

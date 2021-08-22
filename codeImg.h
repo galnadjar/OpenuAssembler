@@ -47,4 +47,4 @@ int getCodeLine(codeImgPtr ptr);
 
 codeImgPtr getNextCodeNode(codeImgPtr ptr);
 
-#endif //MAMAN14_CODEIMG_H
+#endif /*MAMAN14_CODEIMG_H*/
