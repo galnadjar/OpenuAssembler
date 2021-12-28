@@ -3,9 +3,7 @@
 /*this function check if an empty line or not, return 1 if is an empty line and 0 if not empty*/
 int isEmptyLine(char* lineInput){
 
-    int ch;
-    int state = VALID,countCh = 0;
-    int i = 0;
+    int state = VALID,ch,i = 0;
 
     while(state == VALID && i < strlen(lineInput)-1){
         ch = (int)lineInput[i];

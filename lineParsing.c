@@ -37,11 +37,11 @@ int parseCategory(int i, char* lineInput, char** wordSaved, int* category, int l
                 if(state == ERROR){ /*problematic letter was found*/
                     if(dot > 0)
                         ERROR_IMPROPER_DIRECTIVE_NAME(line);
-//                        state = handleDirCase(category, word, line);
+
 
                     else if(firstLetter)
                         ERROR_IMPROPER_INSTRUCTION_NAME(line);
-//                        state = handleLabelOrInstruction(category,word,line);
+
 
                     else
                         ERROR_INVALID_CHAR(line,ch);
